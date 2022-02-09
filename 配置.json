@@ -1,0 +1,187 @@
+[
+  {
+    "name": "suiji",
+    "type": "checkbox",
+    "label": "随机模式",
+    "help": "帮助:开启后学习顺序随机进行。"
+  },
+  {
+    "label": "订阅",
+    "type": "select",
+    "name": "ssub",
+    "options": {
+      "a": "关闭订阅",
+      "b": "翻遍全部，直到订阅完成",
+      "c": "只查看上新"
+    }
+  },
+  {
+    "name": "article",
+    "type": "checkbox",
+    "label": "文章学习和广播收听",
+    "help": " "
+  },
+  {
+    "name": "time1",
+    "type": "number",
+    "label": "文章学习时间自定义---每篇文章的秒数",
+    "validation": "required",
+    "help": " "
+  },
+  {
+    "label": "视频学习",
+    "type": "select",
+    "name": "video",
+    "options": {
+      "a": "不进行学习",
+      "b": "百灵视频学习",
+      "c": "看电视视频学习",
+      "d": "新百灵视频学习"
+    }
+  },
+  {
+    "name": "time2",
+    "type": "number",
+    "label": "视频学习时间自定义---每个视频的秒数",
+    "validation": "required",
+    "help": " "
+  },
+  {
+    "name": "meiri",
+    "type": "checkbox",
+    "label": "每日答题",
+    "help": " "
+  },
+  {
+    "name": "tiaozhan",
+    "type": "checkbox",
+    "label": "挑战答题",
+    "help": " "
+  },
+  {
+    "name": "checkbox_01",
+    "type": "checkbox",
+    "label": "专项答题",
+    "help": " "
+  },
+  {
+    "name": "select",
+    "type": "select",
+    "label": "专项答题模式选择",
+    "options": {
+      "a": "不向下滑动，只答当天的题目,没有则返回",
+      "b": "向下滑动，直到找到可答题的题目"
+    },
+    "validation": "required",
+    "help": ""
+  },
+  {
+    "name": "checkbox_02",
+    "type": "checkbox",
+    "label": "每周答题",
+    "help": " "
+  },
+  {
+    "name": "selectm",
+    "type": "select",
+    "label": "每周答题模式选择",
+    "options": {
+      "a": "不向下滑动，只答当天的题目,没有则返回",
+      "b": "向下滑动，直到找到可答题的题目"
+    },
+    "validation": "required",
+    "help": ""
+  },
+  {
+    "name": "checkbox_03",
+    "type": "checkbox",
+    "label": "四人/双人答题",
+    "help": "勾选之前，需要配置以下信息"
+  },
+  {
+    "name": "another",
+    "type": "checkbox",
+    "label": "四人/双人额外进行一次随机答题(乱答)",
+    "help": ""
+  },
+  {
+    "name": "delay",
+    "type": "number",
+    "label": "选项出现和文字识别结束后 点击的延迟时间ms毫秒",
+    "validation": "required",
+    "help": "说明：时间越短点击越快，时间越长点击越慢。\n如果文字识别速度慢于选项出现则可调 0ms -> +∞ms；\n否则不要低于300ms。"
+  },
+  {
+    "name": "select_01",
+    "type": "select",
+    "label": "四人赛模式选择",
+    "options": {
+      "a": "华为OCR接口,需要填入以下关于华为的内容",
+      "d": "百度OCR接口,需要填入以下关于百度的内容",
+      "c": "hamibot内置OCR(速度快-hamibot v1.3以上)->推荐",
+      "b": "第三方OCR插件,需要安装第三方插件(速度适中-hamibot v1.1)"
+    },
+    "validation": "required",
+    "help": "注：一般手机本地识别速度大于云端，部分手机内置ocr识别较慢，请自行测试三种ocr"
+  },
+  {
+    "name": "AK",
+    "type": "text",
+    "label": "百度OCR的API Key",
+    "help": " "
+  },
+  {
+    "name": "SK",
+    "type": "text",
+    "label": "百度OCR的Secret Key",
+    "help": " "
+  },
+  {
+    "name": "endpoint",
+    "type": "text",
+    "label": "华为OCR的Endpoint",
+    "help": " "
+  },
+  {
+    "name": "username",
+    "type": "text",
+    "label": "华为OCR刚刚新建的用户名",
+    "help": " "
+  },
+  {
+    "name": "password",
+    "type": "text",
+    "label": "华为OCR刚刚新建的用户名密码",
+    "help": " "
+  },
+  {
+    "name": "domainname",
+    "type": "text",
+    "label": "华为OCR的账号名",
+    "help": " "
+  },
+  {
+    "name": "projectname",
+    "type": "text",
+    "label": "华为OCR的项目名",
+    "help": " "
+  },
+  {
+    "name": "project_Id",
+    "type": "text",
+    "label": "华为OCR的projectId",
+    "help": " "
+  },
+  {
+    "name": "Token",
+    "type": "text",
+    "label": "push+ 消息推送",
+    "help": "注：有需要的自行填写push+的Token，否则留空即可"
+  },
+  {
+    "name": "",
+    "type": "link",
+    "label": "---------------------------------",
+    "help": "https://hamibot.com/marketplace/1Kw2X?invite=ONTRWIBaZqdBWuDk6DNzT7rt"
+  }
+]
