@@ -1386,8 +1386,68 @@ function dailyQuestionLoop() {
 
     if (textStartsWith("填空题").exists()) {
         if (answer == "") {
-            var tipsStr = getTipsStr();
-            answer = getAnswerFromTips(questionArray, tipsStr);
+            var seeTips = text("查看提示").findOnce();
+            seeTips.click();
+            console.setPosition(device.width / 4, -device.height / 4);
+            delay(2);
+            var flag = false;
+            try{
+                var img = captureScreen();
+                img = images.inRange(img, '#FFFF0000', '#FFFF0000');
+                // images.save(img, "/sdcard/ttt.jpg", "jpg");
+                var res = http.post(
+                    'https://aip.baidubce.com/oauth/2.0/token',
+                    {
+                        grant_type: 'client_credentials',
+                        client_id: hamibot.env.AK.replace(/ /g, ''),
+                        client_secret: hamibot.env.SK.replace(/ /g, '')
+                    }
+                );
+                var xad = res.body.json()['access_token'];
+                answer = baidu_ocr_api(img,xad);
+            }catch(e){
+                try{
+                    var img = captureScreen();
+                    img = images.inRange(img, '#FFFF0000', '#FFFF0000');
+                    var res = http.postJson(
+                        'https://iam.cn-north-4.myhuaweicloud.com/v3/auth/tokens', {
+                            "auth": {
+                                "identity": {
+                                    "methods": [
+                                        "password"
+                                    ],
+                                    "password": {
+                                        "user": {
+                                            "name": username, //替换为实际用户名
+                                            "password": password, //替换为实际的用户密码
+                                            "domain": {
+                                                "name": domainname //替换为实际账号名
+                                            }
+                                        }
+                                    }
+                                },
+                                "scope": {
+                                    "project": {
+                                        "name": projectname //替换为实际的project name，如cn-north-4
+                                    }
+                                }
+                            }
+                        }, {
+                            headers: {
+                                'Content-Type': 'application/json;charset=utf8'
+                            }
+                        }
+                    );
+                    answer = huawei_ocr_api(img,res.headers['X-Subject-Token']);
+                }catch(e){flag = true;}
+            }
+            console.setPosition(0, device.height / 2);
+            back();
+            if(flag){
+                delay(1);
+                var tipsStr = getTipsStr();
+                answer = getAnswerFromTips(questionArray, tipsStr);
+            }
             console.info("提示中的答案：" + answer);
             if (answer == '') answer = '没有找到提示';
             setText(0, answer.substr(0, blankArray[0]));
@@ -1517,12 +1577,12 @@ function dailyAnswer() {
  * @return: answer 答案
  */
 function getAnswer(question) {
-    question = question.split('来源：')[0]; //去除来源
-    question = question.replace(/ /g, '');//再删除多余空格
-    question = question.replace(/  /g, '');
+    var question1 = question.split('来源：')[0]; //去除来源
+    question1 = question1.replace(/ /g, '');//再删除多余空格
+    question1 = question1.replace(/  /g, '');
     var q = ''
-    for(var i = 0;i<question.length;i++){
-        q += question[i];
+    for(var i = 0;i<question1.length;i++){
+        q += question1[i];
         q+='%';
     }
     //log('搜索题目：' + question1);
@@ -1536,7 +1596,73 @@ function getAnswer(question) {
         }else{
             return '';
         }
-    }catch(e){console.error(e);return '';}
+    }catch(e){
+        question1 = question;
+        question1 = question1.split('来源：')[0]; //去除来源
+        question1 = question1.replace(/“/g, '"');
+        question1 = question1.replace(/”/g, '"');
+        if (question.length > 10) {
+            var ed = question.indexOf(' ') - 1; //注意，里面内容不是空格，是一种看不见的符号
+            //console.error(ed);
+            if (ed != -2) {
+                var s = Math.max(0, ed - 10);
+                if (s == 0) {
+                    question1 = question.slice(ed + 9, ed + 10 + 9);
+                } else question1 = question.slice(s, ed);
+                //console.info(s + "->" + ed);
+            } else {
+                var st = parseInt(question.length / 3);
+                question1 = question.slice(st, Math.min(st + 10, question.length - 1));
+                //console.info(st + "->" + Math.min(st + 10, question.length - 1));
+            }
+        }
+        question1 = question1.replace(/ /g, ''); //再删除多余空格
+        //log('搜索题目：' + question1);
+
+        var r1 = http.get('http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question1), {
+            headers: {
+                'Accept-Language': 'zh-cn,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.84 Safari/537.36',
+            },
+        });
+        var body = r1.body.string();
+        var result1 = body.match(/答案：../g);
+        var result;
+        var flag = 3;
+        if (result1) {
+            if (result1 && result1[0].charCodeAt(4) > 64 && result1[0].charCodeAt(4) < 69) result = result1, flag = 4;
+            else if (result1 && result1[0].charCodeAt(3) > 64 && result1[0].charCodeAt(3) < 69) result = result1;
+            else {
+                console.log(result1);
+                console.error(body);
+                return '';
+            }
+        } else if (question1.indexOf('，') != -1) {
+            //console.error('没搜到，改逗号再搜索一次');
+            question1 = question1.replace(/，/g, ',');
+            r1 = http.get('http://www.syiban.com/search/index/init.html?modelid=1&q=' + encodeURI(question1), {
+                headers: {
+                    'Accept-Language': 'zh-cn,zh;q=0.5',
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.84 Safari/537.36',
+                },
+            });
+            body = r1.body.string();
+            result1 = body.match(/答案：../g);
+            if (result1) {
+                if (result1 && result1[0].charCodeAt(4) > 64 && result1[0].charCodeAt(4) < 69) result = result1, flag = 4;
+                else if (result1 && result1[0].charCodeAt(3) > 64 && result1[0].charCodeAt(3) < 69) result = result1;
+                else {
+                    console.error(body);
+                    return '';
+                }
+            } else {
+                return '';
+            }
+        } else return '';
+        var num = ['A', 'B', 'C', 'D'];
+        var answer = num[result[0].charCodeAt(flag) - 65];
+        return answer;
+    }
     
 }
 
@@ -2072,7 +2198,7 @@ function do_contest_answer(depth_option, question1) {
  * 点击对应的去答题或去看看
  * @param {image} img 传入图片
  */
- function baidu_ocr_api(img) {
+ function baidu_ocr_api(img,tokens) {
     console.log('百度ocr文字识别中');
     var answer = "";
     var res = http.post(
@@ -2081,7 +2207,7 @@ function do_contest_answer(depth_option, question1) {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            access_token: token,
+            access_token: tokens,
             image: images.toBase64(img),
         }
     );
@@ -2118,7 +2244,7 @@ function hamibot_ocr_api(img) {
     var answer = ocr.recognizeText(img);
     return answer.replace(/\s*/g, "");
 }
-function huawei_ocr_api(img) {
+function huawei_ocr_api(img,tokens) {
     console.log('华为ocr文字识别中');
     var answer = "";
     var res = http.postJson(
@@ -2127,7 +2253,7 @@ function huawei_ocr_api(img) {
         }, {
             headers: {
                 "User-Agent": "API Explorer",
-                "X-Auth-Token": token,
+                "X-Auth-Token": tokens,
                 "Content-Type": "application/json;charset=UTF-8"
             }
         }
@@ -2173,13 +2299,13 @@ function zsyAnswer() {
         threshold: 10,
     });
     if (choose == 'a') {
-        huawei_ocr_api(img);
+        huawei_ocr_api(img,token);
     } else if (choose == 'b') {
         ocr_api(img);
     } else if (choose == 'c') {
         hamibot_ocr_api(img);
     }
-    else baidu_ocr_api(img);
+    else baidu_ocr_api(img,token);
     var count = 2;
     console.info('改变提示框位置');
     console.setPosition(device.width / 4, -device.height / 4);
@@ -2221,13 +2347,13 @@ function zsyAnswer() {
             img = images.clip(img, x, y, dx, dy);
             var question;
             if (choose == 'a') {    // 文字识别
-                question = huawei_ocr_api(img);
+                question = huawei_ocr_api(img,token);
             } else if (choose == 'b') {
                 question = ocr_api(img);
             } else if (choose == 'c') {
                 question = hamibot_ocr_api(img);
             }
-            else question = baidu_ocr_api(img);
+            else question = baidu_ocr_api(img,token);
             question = question.slice(question.indexOf('.') + 1);
             question = question.replace(/,/g, "，");
             log(question);
