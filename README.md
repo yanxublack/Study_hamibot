@@ -2,6 +2,7 @@
 
 
 
+
 **为了学习而Study**
 
 修改来源于：[LazyStudy](https://github.com/lolisaikou/LazyStudy)
@@ -32,6 +33,13 @@
 
 ---
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/img_convert/822012bea125887c6d957c3fe31be0c0.png#pic_center)
+
+---
+
+## 2022.02.11.527
+
+ 1. 解决部分人挑战答题异常；
+ 2. 优化每日答题、每周答题、专项答题的填空类型题目，将在此时调用百度OCR或华为OCR进行文字识别正确的填空答案（如果配置了百度OCR或华为OCR的话）
 
 ---
 
