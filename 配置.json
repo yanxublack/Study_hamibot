@@ -93,6 +93,18 @@
     "help": ""
   },
   {
+    "name": "stronger",
+    "type": "select",
+    "label": "每日、每周、专项答题增强模式",
+    "options": {
+      "a": "关闭",
+      "b": "使用华为OCR识别答案",
+      "c": "使用百度OCR识别答案"
+    },
+    "validation": "required",
+    "help": ""
+  },
+  {
     "name": "checkbox_03",
     "type": "checkbox",
     "label": "四人/双人答题",
@@ -145,25 +157,25 @@
   {
     "name": "username",
     "type": "text",
-    "label": "华为OCR刚刚新建的用户名",
+    "label": "华为OCR刚刚新建的用户名-username",
     "help": " "
   },
   {
     "name": "password",
     "type": "text",
-    "label": "华为OCR刚刚新建的用户名密码",
+    "label": "华为OCR刚刚新建的用户名密码-password",
     "help": " "
   },
   {
     "name": "domainname",
     "type": "text",
-    "label": "华为OCR的账号名",
+    "label": "华为OCR的账号名-domainname",
     "help": " "
   },
   {
     "name": "projectname",
     "type": "text",
-    "label": "华为OCR的项目名",
+    "label": "华为OCR的项目名-projectname",
     "help": " "
   },
   {
