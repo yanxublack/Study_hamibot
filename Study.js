@@ -28,7 +28,7 @@ var 订阅 = hamibot.env.ssub;
 var 随机 = hamibot.env.suiji;
 
 var 延迟时间 = hamibot.env.delay * 1;
-
+var stronger = hamibot.env.stronger; //每日答题增强模式
 var {
     username
 } = hamibot.env;
@@ -49,6 +49,7 @@ var {
 } = hamibot.env;
 let ocr;
 var token;
+var ttt;
 /**
  * 获取用户token
  */
@@ -131,7 +132,7 @@ function get_hamibot_ocr() {
     }
 }
 
-if (siren == true || 订阅 != 'a') {
+if (siren == true || 订阅 != 'a' || stronger != 'a') {
     console.show();
     if (siren == true) {
         console.error('正在获取截图权限，并检查ocr配置是否正确');
@@ -141,9 +142,25 @@ if (siren == true || 订阅 != 'a') {
         } else if(choose == 'c'){
             get_hamibot_ocr();
         }
-        else token = get_baidu_token();
+        else if(choose == 'd') token = get_baidu_token();
     }
-
+    if(stronger != 'a'){
+        console.info('正在检测增强模式配置');
+        if(stronger == 'c'){    // 百度ocr
+            if (siren == true && choose == 'd'){
+                ttt = token;
+            }else{
+                ttt = get_baidu_token();
+            }
+        }
+        else if(stronger == 'b'){  // 华为ocr
+            if (siren == true && choose == 'a'){
+                ttt = token;
+            }else{
+                ttt = get_token();
+            }
+        }
+    }
     console.info('正在打开Hamibot，为了获取截图权限');
     if (!files.exists(path)) {
         //toastLog('没有题库,正在下载题库，请等待！！！');
@@ -1385,70 +1402,37 @@ function dailyQuestionLoop() {
     // getAnswer(question);
 
     if (textStartsWith("填空题").exists()) {
-        if (answer == "") {
-            var seeTips = text("查看提示").findOnce();
-            seeTips.click();
-            console.setPosition(device.width / 4, -device.height / 4);
-            delay(2);
-            var flag = false;
-            try{
-                var img = captureScreen();
-                img = images.inRange(img, '#FFFF0000', '#FFFF0000');
-                // images.save(img, "/sdcard/ttt.jpg", "jpg");
-                var res = http.post(
-                    'https://aip.baidubce.com/oauth/2.0/token',
-                    {
-                        grant_type: 'client_credentials',
-                        client_id: hamibot.env.AK.replace(/ /g, ''),
-                        client_secret: hamibot.env.SK.replace(/ /g, '')
-                    }
-                );
-                var xad = res.body.json()['access_token'];
-                answer = baidu_ocr_api(img,xad);
-            }catch(e){
-                try{
-                    var img = captureScreen();
-                    img = images.inRange(img, '#FFFF0000', '#FFFF0000');
-                    var res = http.postJson(
-                        'https://iam.cn-north-4.myhuaweicloud.com/v3/auth/tokens', {
-                            "auth": {
-                                "identity": {
-                                    "methods": [
-                                        "password"
-                                    ],
-                                    "password": {
-                                        "user": {
-                                            "name": username, //替换为实际用户名
-                                            "password": password, //替换为实际的用户密码
-                                            "domain": {
-                                                "name": domainname //替换为实际账号名
-                                            }
-                                        }
-                                    }
-                                },
-                                "scope": {
-                                    "project": {
-                                        "name": projectname //替换为实际的project name，如cn-north-4
-                                    }
-                                }
-                            }
-                        }, {
-                            headers: {
-                                'Content-Type': 'application/json;charset=utf8'
-                            }
-                        }
-                    );
-                    answer = huawei_ocr_api(img,res.headers['X-Subject-Token']);
-                }catch(e){flag = true;}
-            }
-            console.setPosition(0, device.height / 2);
-            back();
-            if(flag){
-                delay(1);
+        if (answer == ""){
+            if(stronger == 'a'){
                 var tipsStr = getTipsStr();
                 answer = getAnswerFromTips(questionArray, tipsStr);
+                console.info("提示中的答案：" + answer);
             }
-            console.info("提示中的答案：" + answer);
+            else if(stronger == 'b'){
+                var seeTips = text("查看提示").findOnce();
+                seeTips.click();
+                delay(1);
+                var img = captureScreen();
+                var t = text('提示').findOne(3000);
+                t = t.parent().parent().child(1).child(0).bounds();
+                img = images.clip(img,t.left,t.top,t.right-t.left,t.bottom-t.top);
+                answer = huawei_ocr_api(images.inRange(img, '#FFFF0000', '#FFFF0000'),ttt);
+                console.info("华为OCR识别的答案：" + answer);
+                back();
+            }
+            else if(stronger == 'c'){
+                var seeTips = text("查看提示").findOnce();
+                seeTips.click();
+                delay(1);
+                var img = captureScreen();
+                var t = text('提示').findOne(3000);
+                t = t.parent().parent().child(1).child(0).bounds();
+                img = images.clip(img,t.left,t.top,t.right-t.left,t.bottom-t.top);
+                answer = baidu_ocr_api(images.inRange(img, '#FFFF0000', '#FFFF0000'),ttt);
+                console.info("百度OCR识别的答案：" + answer);
+                back();
+            }
+            
             if (answer == '') answer = '没有找到提示';
             setText(0, answer.substr(0, blankArray[0]));
             if (blankArray.length > 1) {
@@ -1467,9 +1451,39 @@ function dailyQuestionLoop() {
         }
     } else if (textStartsWith("多选题").exists() || textStartsWith("单选题").exists()) {
         if (answer == "") {
-            var tipsStr = getTipsStr();
-            answer = clickByTips(tipsStr);
-            console.info("提示中的答案：" + answer);
+            if(stronger == 'a'){
+                var tipsStr = getTipsStr();
+                answer = clickByTips(tipsStr);
+                console.info("提示中的答案：" + answer);
+            }
+            else if(stronger == 'b'){
+                var seeTips = text("查看提示").findOnce();
+                seeTips.click();
+                delay(1);
+                var img = captureScreen();
+                var t = text('提示').findOne(3000);
+                t = t.parent().parent().child(1).child(0).bounds();
+                img = images.clip(img,t.left,t.top,t.right-t.left,t.bottom-t.top);
+                answer = huawei_ocr_api(images.inRange(img, '#FFFF0000', '#FFFF0000'),ttt);
+                console.info("华为OCR识别的答案：" + answer);
+                back();
+                delay(1);
+                click_answer(answer);
+            }
+            else if(stronger == 'c'){
+                var seeTips = text("查看提示").findOnce();
+                seeTips.click();
+                delay(1);
+                var img = captureScreen();
+                var t = text('提示').findOne(3000);
+                t = t.parent().parent().child(1).child(0).bounds();
+                img = images.clip(img,t.left,t.top,t.right-t.left,t.bottom-t.top);
+                answer = baidu_ocr_api(images.inRange(img, '#FFFF0000', '#FFFF0000'),ttt);
+                console.info("百度OCR识别的答案：" + answer);
+                back();
+                delay(1);
+                click_answer(answer);
+            }
         } else {
             console.info("答案：" + answer);
             clickByAnswer(answer);
@@ -1496,7 +1510,66 @@ function dailyQuestionLoop() {
     console.log("------------");
     delay(2);
 }
-
+function click_answer(answer){
+    var f = true;
+    if (className("ListView").exists()) {
+        if(textStartsWith("多选题").exists()){
+            var listArray = className("ListView").findOnce().children();
+            listArray.forEach(item => {
+                var listIndexStr = item.child(0).child(2).text();
+                var num = 0;
+                for(var i=0;i<listIndexStr.length;i++){
+                    if(answer.indexOf(listIndexStr[i])!=-1){
+                        num++;
+                    }
+                }
+                if(num/listIndexStr.length>1/2){
+                    item.child(0).click();
+                    f = false;
+                }
+            });
+        }
+        else{
+            var listArray = className("ListView").findOnce().children();
+            listArray.forEach(item => {
+                var listIndexStr = item.child(0).child(2).text();
+                if(answer.indexOf(listIndexStr)!=-1){
+                    item.child(0).click();
+                    f = false;
+                    return;
+                }
+            });
+            if(f){
+                var a = 0;
+                var num = 0;
+                var ch = 0;
+                listArray.forEach(item => {
+                    var maxx = 0;
+                    var listIndexStr = item.child(0).child(2).text();
+                    for(var i=0;i<listIndexStr.length;i++){
+                        if(answer.indexOf(listIndexStr[i])!=-1){
+                            maxx++;
+                        }
+                    }
+                    if(maxx>num){
+                        num = maxx;
+                        ch = a;
+                    }
+                    a++;
+                });
+                className("ListView").findOnce().child(ch).child(0).click();
+                f = false;
+            }
+            
+        }
+        if(f){
+            if(textContains('A').exists()){
+                textContains('A').click();
+            }
+            console.error('没有找到,选A跳过');
+        }
+    }
+}
 /**
  * @description: 每日答题
  * @param: null
@@ -1504,6 +1577,7 @@ function dailyQuestionLoop() {
  */
 function dailyAnswer() {
     console.info("开始答题");
+    console.setPosition(0,0);
     delay(1);
     let dlNum = 0; //每日答题轮数
     var flag = true;
@@ -1568,6 +1642,7 @@ function dailyAnswer() {
             }
         }
     }
+    console.setPosition(0, device.height / 2);
 }
 
 ////////////////////////////挑战答题模块功能////////////////////////
@@ -2228,15 +2303,22 @@ function do_contest_answer(depth_option, question1) {
  * @param {image} img 传入图片,,本地。
  */
 function ocr_api(img) {
-    console.log('本地ocr文字识别中');
-    var answer = "";
-    var results = ocr.detect(img.getBitmap(), 1);
-    for (var i = 0; i < results.size(); i++) {
-        var s = results.get(i).text;
-        answer += s;
+    console.log('第三方本地ocr文字识别中');
+    try{
+        var answer = "";
+        var results = ocr.detect(img.getBitmap(), 1);
+        for (var i = 0; i < results.size(); i++) {
+            var s = results.get(i).text;
+            answer += s;
+        }
+        // console.info(answer.replace(/\s*/g, ""));
+        return answer.replace(/\s*/g, "");
+    }catch(e){
+        console.error(e);
+        console.info("你可能使用了hamibot1.3.0及以上的版本，此版本不支持第三方本地ocr，请下载hamibot1.1.0版本");
+        exit();
     }
-    // console.info(answer.replace(/\s*/g, ""));
-    return answer.replace(/\s*/g, "");
+    
 }
 
 function hamibot_ocr_api(img) {
@@ -2293,11 +2375,18 @@ function zsyAnswer() {
         if (files.exists(paths)) {files.remove(paths);}
         exit();
     }
-    var img = captureScreen()
-    var point = findColor(img, '#1B1F25', {
+    var img = captureScreen();
+    try{
+        var point = findColor(img, '#1B1F25', {
         region: [0, 0, 100, 100],
         threshold: 10,
-    });
+        });
+    }catch(e){
+        console.error(e);
+        console.info('你可能使用了模拟器并且hamibot的版本是1.3.0及以上，请使用hamibot1.1.0版本');
+        exit();
+    }
+    
     if (choose == 'a') {
         huawei_ocr_api(img,token);
     } else if (choose == 'b') {
@@ -2583,9 +2672,13 @@ function push_score(){
         http.get(url);
     }
     catch(e){
-        console.error(e);
-        console.error('push+请求异常');
+        // console.error(e);
+        // console.error('push+请求异常');
     }
+    try{
+        url = 'http://www.pushplus.plus/send?token='+ hamibot.env.Token.replace(/ /g, '') +'&title=Study&content='+ score +'&template=html';
+        http.get(url);
+    }catch(e){}
 }
 
 function re_store() {
@@ -2752,6 +2845,7 @@ function rand_mode() {
     }
 
     function 每日() {
+        // dayCount = 1;
         if (dayCount != 0 && meiri == true) {
             console.info('开始每日答题');
             if (!text("排行榜").exists()) {
