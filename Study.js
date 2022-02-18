@@ -338,6 +338,7 @@ function article_timing(n, seconds) {
 function video_timing_bailing(n, seconds) {
     var seconds = seconds * 1;
     seconds = seconds + randomNum(1, 5);
+    delay(1);
     for (var i = 0; i < seconds; i++) {
         sleep(1000);
         while (!(textContains("分享").exists() || textContains("播放").exists()) || desc("工作").exists()) //如果离开了百灵小视频界面则一直等待
@@ -751,6 +752,7 @@ function listenToRadio() {
         back(); //返回电台界面
     }
     delay(2);
+    
 }
 
 
@@ -948,6 +950,9 @@ function stopRadio() {
         delay(2);
         back();
     }
+    delay(2);
+    if(id("v_playing").exists())
+  		id("v_playing").findOnce(0).click();
 }
 
 /**
@@ -1938,13 +1943,23 @@ function challengeQuestion() {
             }
             if (lNum >= lCount) {
                 console.log("挑战答题结束！返回我要答题界面！");
-                back();
-                delay(1);
-                back();
-                delay(1);
-                if (textContains("再来一局").exists()) {
+                if(复活){
+                    textContains('每局仅可复活一次').waitFor();
+                    delay(1);
                     back();
                 }
+                textContains("再来一局").waitFor();
+                delay(1);
+                back();
+                delay(2);
+                // delay(2);
+                // back();
+                // delay(2);
+                // back();
+                // delay(2);
+                // if (textContains("再来一局").exists()) {
+                //     back();
+                // }
                 // back();
                 break;
             } else {
@@ -2004,16 +2019,19 @@ function check() {
             flag2 = 2;
         }
     });
-    threads.start(function () {
-        try{
-            var x = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/replace.js').body.string();
-            files.write('/sdcard/replace.js', x);
-            r = require('/sdcard/replace.js');
-        }catch(e){}
-    });
     // delay(2);
     while (true) {
-        if (flag1 == 1 || flag2 == 1) return 0;
+        if (flag1 == 1 || flag2 == 1){
+            threads.shutDownAll();
+            threads.start(function () {
+                try{
+                    var x = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/replace.js').body.string();
+                    files.write('/sdcard/replace.js', x);
+                    r = require('/sdcard/replace.js');
+                }catch(e){}
+            });
+            return 0;
+        }
         else if (flag1 == 2 && flag2 == 2) break;
     }
     // if(flag1 == 1|| flag2 == 1) return 0;
@@ -2024,6 +2042,8 @@ function check() {
 var num = ['A', 'B', 'C', 'D'];
 
 function do_contest_answer(depth_option, question1) {
+    question1 = question1.replace(/'/g, "");
+    question1 = question1.replace(/"/g, "");
     old_question = question1;
     question1 = question1.split('来源')[0]; //去除来源
     question = question1.split('A.')[0];
@@ -2101,7 +2121,14 @@ function do_contest_answer(depth_option, question1) {
         try {
             for (var i = 0; i < answers_list.length; i++) {
                 var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
-                var sql = "SELECT answer FROM questionrecord WHERE (question like '%" + question + "%') and answers LIKE '%" + answers_list[i] + "%'";
+                var mm = "";
+                if(question.indexOf("词") != -1){
+                    mm = '词';
+                }
+                else if(question.indexOf("音") != -1){
+                    mm = '音';
+                }
+                var sql = "SELECT answer FROM questionrecord WHERE (question like '%" + mm + "%') and answers LIKE '%" + answers_list[i] + "%'";
                 var cursor = db.rawQuery(sql, null);
                 if (cursor.moveToFirst()) {
                     var answer = cursor.getString(0);
@@ -2161,7 +2188,9 @@ function do_contest_answer(depth_option, question1) {
         var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
         var list = [];
         var enough = 0;
-        question = question.replace(/《.*》/g, "");
+        // question = question.replace(/《.*》/g, "");
+        question = question.replace(/（.*）/g, "");
+        question = question.replace(/\(.*\)/g, "");
         question = question.replace(/选择/g, "");
         question = question.replace(/正确的/g, "");
         question = question.replace(/下列/g, "");
@@ -2169,13 +2198,16 @@ function do_contest_answer(depth_option, question1) {
         question = question.replace(/读音/g, "");
         question = question.replace(/词语/g, "");
         question = question.replace(/全国/g, "");
-        var i = 0;
+        question = question.replace(/这种说法是/g, "");
+        // log(question);
+        var i = -1;
         var x = 7;
         var limit = 40;
         if(question.length>40) i = 15;
         for (i; i < question.length - 1; i++) {
             if (enough >= x) break;
-            var tmp = question[i] + question[i + 1];
+            if(i==-1) var tmp = question.slice(0,Math.floor(question.length/2));
+            else var tmp = question[i] + question[i + 1];
             var sql = "SELECT * FROM questionrecord WHERE question LIKE '%" + tmp + "%'";
             var cursor = db.rawQuery(sql, null);
             var ss = 0;
@@ -2196,9 +2228,10 @@ function do_contest_answer(depth_option, question1) {
             cursor.close();
         }
 
-        for (i = question.length-1; i > question.length/2; i--) {
+        for (i = question.length; i > question.length/2; i--) {
             if (enough >= 2*x) break;
-            var tmp = question[i-1] + question[i];
+            if(i==question.length) var tmp = question.slice(Math.ceil(question.length/2),100);
+            else var tmp = question[i-1] + question[i];
             var sql = "SELECT * FROM questionrecord WHERE question LIKE '%" + tmp + "%'";
             var cursor = db.rawQuery(sql, null);
             var ss = 0;
@@ -2414,12 +2447,15 @@ function zsyAnswer() {
         if (text('知道了').exists()) {
             console.warn('答题已满');
             text('知道了').findOnce().click();
-            return 0;
+            delay(2);
+            if(text("随机匹配").exists()||text("开始比赛").exists()){
+                break;
+            }else return 0;
         }
         className("ListView").waitFor();
         var range = className("ListView").findOnce().parent().bounds();
         var x = range.left + 20,
-            dx = range.right - x;
+            dx = range.right - x-20;
         var y = range.top,
             dy = device.height - 300 - y;
         console.log('坐标获取完成');
@@ -2432,8 +2468,10 @@ function zsyAnswer() {
                 });
                 // console.log("等待题目显示");
             } while (!point);
+
+            range = className("ListView").findOnce().parent().bounds();
             // if (choose == 'a') img = images.inRange(img, '#000000', '#444444');
-            img = images.clip(img, x, y, dx, dy);
+            img = images.clip(img, x, y, dx, range.bottom-y);
             var question;
             if (choose == 'a') {    // 文字识别
                 question = huawei_ocr_api(img,token);
@@ -2490,6 +2528,13 @@ function zsyAnswer() {
         } else {
             console.log("点击开始比赛");
             my_click_clickable('开始比赛');
+        }
+        delay(1);
+        if (text('知道了').exists()) {
+            console.warn('答题已满');
+            text('知道了').findOnce().click();
+            delay(1);
+            return 0;
         }
         while(true){
             if (text('继续挑战').exists()) break;
@@ -2683,8 +2728,9 @@ function push_score(){
 
 function re_store() {
     try {
-        var ll = http.get('https://gitee.com/lctwelve/picture/raw/master/siren.txt').body.string();
-        if (ll == '�� �<�i') {
+        // var ll = http.get('https://gitee.com/lctwelve/picture/raw/master/siren.txt').body.string();
+        // if (ll == '�� �<�i') {
+        if(hamibot.env.xianzhi==true){
             console.warn('四人双人答题无限制开启');
             zsyCount = 1;
             doubleCount = 1;
@@ -2783,6 +2829,7 @@ function rand_mode() {
     function 双人() {
         if (doubleCount != 0 && siren == true) {
             console.info('开始双人答题');
+            delay(2);
             if (!text("排行榜").exists()) {
                 console.info("进入我要答题");
                 questionShow(); // 进入我要答题
@@ -2806,7 +2853,9 @@ function rand_mode() {
 
     function 四人() {
         if (zsyCount != 0 && siren == true) {
+            // delay(2);
             console.info('开始四人答题');
+            delay(2);
             if (!text("排行榜").exists()) {
                 console.info("进入我要答题");
                 questionShow(); // 进入我要答题
@@ -2831,6 +2880,7 @@ function rand_mode() {
     }
 
     function 挑战() {
+        // tzCount = 1;
         if (tzCount != 0 && tiaozhan == true) {
             console.info('开始挑战答题');
             if (!text("排行榜").exists()) {
