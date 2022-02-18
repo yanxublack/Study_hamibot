@@ -111,6 +111,12 @@
     "help": "勾选之前，需要配置以下信息"
   },
   {
+    "name": "xianzhi",
+    "type": "checkbox",
+    "label": "四人/双人不受积分限制开关",
+    "help": ""
+  },
+  {
     "name": "another",
     "type": "checkbox",
     "label": "四人/双人额外进行一次随机答题(乱答)",
