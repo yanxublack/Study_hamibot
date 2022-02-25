@@ -3,6 +3,7 @@
 
 
 
+
 **为了学习而Study**
 
 修改来源于：[LazyStudy](https://github.com/lolisaikou/LazyStudy)
@@ -34,15 +35,16 @@
 ---
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/img_convert/822012bea125887c6d957c3fe31be0c0.png#pic_center)
 
-
+---
+## 2022.02.25.570
+- 根据近一个月大家反馈的错题错字，重写了部分四人/双人搜题逻辑
 
 ---
-
-## 2022.02.18.552
+## 2022.02.19.555
 - 亿点点优化
 
 
----
+----
 
 ## 2022.02.14.539
 - 增加每日、每周、专项答题增强模式 - 使用云端OCR进行文字识别(本地ocr识别准确度较低，故不采用) 
@@ -112,3 +114,7 @@
 
  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/img_convert/d14b5725b7463db01c17a677bdfc06d8.png#pic_center)
+
+
+
+
