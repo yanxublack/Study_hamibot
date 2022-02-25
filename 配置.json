@@ -1,11 +1,5 @@
 [
   {
-    "name": "suiji",
-    "type": "checkbox",
-    "label": "随机模式",
-    "help": "帮助:开启后学习顺序随机进行。"
-  },
-  {
     "label": "订阅",
     "type": "select",
     "name": "ssub",
@@ -22,13 +16,6 @@
     "help": " "
   },
   {
-    "name": "time1",
-    "type": "number",
-    "label": "文章学习时间自定义---每篇文章的秒数",
-    "validation": "required",
-    "help": " "
-  },
-  {
     "label": "视频学习",
     "type": "select",
     "name": "video",
@@ -38,13 +25,6 @@
       "c": "看电视视频学习",
       "d": "新百灵视频学习"
     }
-  },
-  {
-    "name": "time2",
-    "type": "number",
-    "label": "视频学习时间自定义---每个视频的秒数",
-    "validation": "required",
-    "help": " "
   },
   {
     "name": "meiri",
@@ -93,41 +73,17 @@
     "help": ""
   },
   {
-    "name": "stronger",
-    "type": "select",
-    "label": "每日、每周、专项答题增强模式",
-    "options": {
-      "a": "关闭",
-      "b": "使用华为OCR识别答案",
-      "c": "使用百度OCR识别答案"
-    },
-    "validation": "required",
-    "help": ""
-  },
-  {
     "name": "checkbox_03",
     "type": "checkbox",
     "label": "四人/双人答题",
     "help": "勾选之前，需要配置以下信息"
   },
   {
-    "name": "xianzhi",
-    "type": "checkbox",
-    "label": "四人/双人不受积分限制开关",
-    "help": ""
-  },
-  {
-    "name": "another",
-    "type": "checkbox",
-    "label": "四人/双人额外进行一次随机答题(乱答)",
-    "help": ""
-  },
-  {
     "name": "delay",
     "type": "number",
     "label": "选项出现和文字识别结束后 点击的延迟时间ms毫秒",
     "validation": "required",
-    "help": "说明：时间越短点击越快，时间越长点击越慢。\n如果文字识别速度慢于选项出现则可调 0ms -> +∞ms；\n否则不要低于300ms。"
+    "help": "说明：时间越短点击越快，时间越长点击越慢。时间太短可能卡住，调高即可"
   },
   {
     "name": "select_01",
@@ -191,15 +147,59 @@
     "help": " "
   },
   {
+    "name": "",
+    "type": "link",
+    "label": "------------------------------------------------------------------",
+    "help": "https://hamibot.com/marketplace/1Kw2X?invite=ONTRWIBaZqdBWuDk6DNzT7rt"
+  },
+  {
+    "name": "suiji",
+    "type": "checkbox",
+    "label": "随机模式",
+    "help": "帮助:开启后学习顺序随机进行。"
+  },
+  {
+    "name": "time1",
+    "type": "number",
+    "label": "文章学习时间自定义---每篇文章的秒数",
+    "validation": "required",
+    "help": " "
+  },
+  {
+    "name": "time2",
+    "type": "number",
+    "label": "视频学习时间自定义---每个视频的秒数",
+    "validation": "required",
+    "help": " "
+  },
+  {
+    "name": "xianzhi",
+    "type": "checkbox",
+    "label": "四人/双人不受积分限制开关",
+    "help": ""
+  },
+  {
+    "name": "another",
+    "type": "checkbox",
+    "label": "四人/双人额外进行一次随机答题(乱答)",
+    "help": ""
+  },
+  {
+    "name": "stronger",
+    "type": "select",
+    "label": "每日、每周、专项答题增强模式",
+    "options": {
+      "a": "关闭",
+      "b": "使用华为OCR识别答案",
+      "c": "使用百度OCR识别答案"
+    },
+    "validation": "required",
+    "help": ""
+  },
+  {
     "name": "Token",
     "type": "text",
     "label": "push+ 消息推送",
     "help": "注：有需要的自行填写push+的Token，否则留空即可"
-  },
-  {
-    "name": "",
-    "type": "link",
-    "label": "---------------------------------",
-    "help": "https://hamibot.com/marketplace/1Kw2X?invite=ONTRWIBaZqdBWuDk6DNzT7rt"
   }
 ]
