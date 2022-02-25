@@ -951,8 +951,11 @@ function stopRadio() {
         back();
     }
     delay(2);
-    if(id("v_playing").exists())
-  		id("v_playing").findOnce(0).click();
+    try{
+        if(id("v_playing").exists())
+  		    id("v_playing").findOnce(0).click();
+    }catch(e){}
+    
 }
 
 /**
@@ -1125,6 +1128,10 @@ function meizhouAnswer() {
                     break;
                 }
                 swipe(x, h1, x, h2, 100); // 下滑动
+                try{
+                    textContains("月").findOnce(0).parent().parent().parent().scrollForward();
+                }
+                catch(e){}
                 delay(1);
                 if (t % 10 == 0)
                     console.log("向下滑动中！！！");
@@ -1153,6 +1160,7 @@ function zhuanxiangAnswer() {
     }
     delay(1);
     var t = 0;
+
     while (true) {
         if (text("继续答题").exists() || text("开始答题").exists()) {
             if (text("继续答题").exists())
@@ -1176,6 +1184,11 @@ function zhuanxiangAnswer() {
                     break;
                 }
                 swipe(x, h1, x, h2, 100); // 下滑动
+                try{
+                    textContains("专项").findOnce(0).parent().scrollForward();
+                }
+                catch(e){}
+
                 //delay(1);
                 if (t % 10 == 0)
                     console.log("向下滑动中！！！");
@@ -2042,13 +2055,15 @@ function check() {
 var num = ['A', 'B', 'C', 'D'];
 
 function do_contest_answer(depth_option, question1) {
+    // console.time('搜题');
     question1 = question1.replace(/'/g, "");
     question1 = question1.replace(/"/g, "");
-    old_question = question1;
+    old_question = JSON.parse(JSON.stringify(question1));
     question1 = question1.split('来源')[0]; //去除来源
     question = question1.split('A.')[0];
     question = question.split('c')[0];
     question = question.split('C')[0];
+    question = question.split('（')[0];
     reg = /下列..正确的是.*/g;
     reb = /选择词语的正确.*/g;
     rea = /选择正确的读音.*/g;
@@ -2185,90 +2200,33 @@ function do_contest_answer(depth_option, question1) {
         }
 
     } else {
-        var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
-        var list = [];
-        var enough = 0;
-        // question = question.replace(/《.*》/g, "");
-        question = question.replace(/（.*）/g, "");
-        question = question.replace(/\(.*\)/g, "");
-        question = question.replace(/选择/g, "");
-        question = question.replace(/正确的/g, "");
-        question = question.replace(/下列/g, "");
-        question = question.replace(/根据/g, "");
-        question = question.replace(/读音/g, "");
-        question = question.replace(/词语/g, "");
-        question = question.replace(/全国/g, "");
-        question = question.replace(/这种说法是/g, "");
-        // log(question);
-        var i = -1;
-        var x = 7;
-        var limit = 40;
-        if(question.length>40) i = 15;
-        for (i; i < question.length - 1; i++) {
-            if (enough >= x) break;
-            if(i==-1) var tmp = question.slice(0,Math.floor(question.length/2));
-            else var tmp = question[i] + question[i + 1];
-            var sql = "SELECT * FROM questionrecord WHERE question LIKE '%" + tmp + "%'";
-            var cursor = db.rawQuery(sql, null);
-            var ss = 0;
-            while (cursor.moveToNext() && ss < limit) {
-                ss += 1;
-                var t = [cursor.getString(2), cursor.getString(1), 1, cursor.getString(3)];
-                for (var k = 0; k < list.length; k++) {
-                    if (list[k][0] == t[0]) {
-                        list[k][2] += 1;
-                        enough = Math.max(list[k][2], enough);
-                        break;
-                    }
-                }
-                if (k == list.length)
-                    list.push(t);
-                if (enough >= x) break;
-            }
-            cursor.close();
-        }
-
-        for (i = question.length; i > question.length/2; i--) {
-            if (enough >= 2*x) break;
-            if(i==question.length) var tmp = question.slice(Math.ceil(question.length/2),100);
-            else var tmp = question[i-1] + question[i];
-            var sql = "SELECT * FROM questionrecord WHERE question LIKE '%" + tmp + "%'";
-            var cursor = db.rawQuery(sql, null);
-            var ss = 0;
-            while (cursor.moveToNext() && ss < limit) {
-                ss += 1;
-                var t = [cursor.getString(2), cursor.getString(1), 1, cursor.getString(3)];
-                for (var k = 0; k < list.length; k++) {
-                    if (list[k][0] == t[0]) {
-                        list[k][2] += 1;
-                        enough = Math.max(list[k][2], enough);
-                        break;
-                    }
-                }
-                if (k == list.length)
-                    list.push(t);
-                if (enough >= 2*x) break;
-            }
-            cursor.close();
-        }
-        var max = -1;
-        var question = '';
-        var answer = 'A';
-        var answers = '没搜到';
-        for (var j = 0; j < list.length; j++) {
-            if (list[j][2] > max && !(reg.test(list[j][0]) || rea.test(list[j][0]) || reb.test(list[j][0]))) {
-                max = list[j][2];
-                question = list[j][0];
-                answer = list[j][1];
-                answers = list[j][3];
+        // var questions = '';
+        var option = '';
+        var answer = '';
+        var similars = 0;
+        var pos = -1;
+        for(var i = 0;i<question_list.length;i++){
+            var s = similarity(question_list[i][0],question,0);
+            if(s>similars){
+                similars = s;
+                pos = i;
             }
         }
+        option = question_list[pos][1];
+        answer = question_list[pos][2];
+        // console.timeEnd('搜题');
         // log(question);
         // log(answer);
         // log(max);
-        if (max == -1) console.error('没搜到答案');
-        if (answer[0] >= 'A' && answer[0] <= 'D') {
-            console.info('点击答案:' + answer[0] + '.' + answers.split('	')[answer[0].charCodeAt(0) - 65]);
+        if (pos == -1) console.error('没搜到答案');
+        if (option[0] >= 'A' && option[0] <= 'D') {
+            if(answer.indexOf('	') != -1){
+                var tmpx = answer.split('	')[option[0].charCodeAt(0) - 65];
+            }
+            else{
+                var tmpx = answer.split(' ')[option[0].charCodeAt(0) - 65];
+            }
+            console.info('点击答案:' + option + '.' + tmpx);
             if (text('继续挑战').exists()) return -1;
             while (!className("ListView").exists()) {
                 // className('android.widget.RadioButton').findOnce(answer[0].charCodeAt(0) - 65).click();
@@ -2279,7 +2237,7 @@ function do_contest_answer(depth_option, question1) {
             sleep(延迟时间);
             first = false;
             try {
-                while(!className("ListView").findOne(5000).child(answer[0].charCodeAt(0) - 65).child(0).click()){
+                while(!className("ListView").findOne(5000).child(option[0].charCodeAt(0) - 65).child(0).click()){
                     if (text('继续挑战').exists()) return -1;
                 };
             } catch (e) {
@@ -2288,20 +2246,42 @@ function do_contest_answer(depth_option, question1) {
                     if (text('继续挑战').exists()) return -1;
                 }
                 try{
-                    className('android.widget.RadioButton').depth(depth_option).findOnce(answer[0].charCodeAt(0) - 65).click();
+                    className('android.widget.RadioButton').depth(depth_option).findOnce(option[0].charCodeAt(0) - 65).click();
                 }catch(e){
                     console.error('没找到答案,选A跳过');
                     className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
                 }  
             }
-            console.log('点击完成');
+            // console.log('点击完成');
             return 0;
         }
         className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
         return 0;
     }
 }
-
+function similarity(question, q,flag) {
+    var num = 0;
+    if(flag){
+        q = q.match(/[\u4e00-\u9fa5]/g).join("");
+        for(var i = 0;i<q.length;i++){
+          if(question.indexOf(q[i])!=-1){
+              num++;
+          }
+        }
+    }
+    else{
+        var tmp = 1;
+        if(q.length>20) tmp = 2;
+        if(q.length>40) tmp = 3;
+        if(q.length>50) tmp = 4;
+        for(var i = 0;i<q.length-tmp;i+=tmp){
+            if(question.indexOf(q[i]+q[i+1])!=-1){
+                num++;
+            }
+        }
+    }
+    return num/(question.length+q.length);
+}
 /**
  * 点击对应的去答题或去看看
  * @param {image} img 传入图片
@@ -2319,6 +2299,7 @@ function do_contest_answer(depth_option, question1) {
             image: images.toBase64(img),
         }
     );
+    
     var res = res.body.json();
     try {
         var words_list = res.words_result;
@@ -2392,7 +2373,17 @@ function huawei_ocr_api(img,tokens) {
  * @param: null
  * @return: null
  */
-
+var question_list = [];
+function init(){
+    var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
+    var sql = "SELECT * FROM questionrecord" ;
+    var cursor = db.rawQuery(sql, null);
+    while (cursor.moveToNext()){
+        if(cursor.getString(1).length>1) continue;
+        // quesion option answer
+        question_list.push([cursor.getString(2).replace(/（.*）/g,'').replace(/_/g,'').split('来源：')[0], cursor.getString(1), cursor.getString(3)])
+    }
+}
 function zsyAnswer() {
     if (!files.exists(paths)) {
         console.error('请检测手机对hamibot的存储权限！！！\n脚本结束');
@@ -2419,7 +2410,7 @@ function zsyAnswer() {
         console.info('你可能使用了模拟器并且hamibot的版本是1.3.0及以上，请使用hamibot1.1.0版本');
         exit();
     }
-    
+    init();
     if (choose == 'a') {
         huawei_ocr_api(img,token);
     } else if (choose == 'b') {
@@ -2468,10 +2459,14 @@ function zsyAnswer() {
                 });
                 // console.log("等待题目显示");
             } while (!point);
-
-            range = className("ListView").findOnce().parent().bounds();
-            // if (choose == 'a') img = images.inRange(img, '#000000', '#444444');
-            img = images.clip(img, x, y, dx, range.bottom-y);
+            try{
+                range = className("ListView").findOnce().parent().bounds();
+                // if (choose == 'a') img = images.inRange(img, '#000000', '#444444');
+                img = images.clip(img, x, y, dx, range.bottom-y);
+            }
+            catch(e){
+                img = images.clip(img, x, y, dx, dy);
+            }
             var question;
             if (choose == 'a') {    // 文字识别
                 question = huawei_ocr_api(img,token);
@@ -2510,6 +2505,7 @@ function zsyAnswer() {
                     threshold: 10,
                 });
             } while (!point);
+            // console.log('等待下一题');
         }
         if (i == 0 && count == 2) {
             sleep(random_time(delay_time));
@@ -2555,7 +2551,7 @@ function zsyAnswer() {
         }
         console.warn('额外一轮结束!');
     }
-    
+    console.info('答题结束');
     delay(1);
     back();
     delay(2);
@@ -2745,6 +2741,8 @@ function back_table() {
         back();
         delay(1);
     }
+    // console.info('当前在主页，回到桌面！');
+    // home();  //回到桌面
 }
 
 function rand_mode() {
@@ -2920,6 +2918,13 @@ function rand_mode() {
         }
         while (!desc("工作").exists()) { //等待加载出主页
             console.info("等待加载主页");
+            if (text("排行榜").exists()) {
+                delay(0.5);
+                back();
+                delay(0.5);
+                back();
+                delay(0.5);
+            }
             delay(2);
         }
         while (vCount != 0 && video != 'a') {
@@ -2952,6 +2957,13 @@ function rand_mode() {
             }
             while (!desc("工作").exists()) { //等待加载出主页
                 console.info("等待加载主页");
+                if (text("排行榜").exists()) {
+                    delay(0.5);
+                    back();
+                    delay(0.5);
+                    back();
+                    delay(0.5);
+                }
                 delay(2);
             }
             localChannel(); //本地频道
@@ -2969,6 +2981,13 @@ function rand_mode() {
             }
             while (!desc("工作").exists()) { //等待加载出主页
                 console.info("等待加载主页");
+                if (text("排行榜").exists()) {
+                    delay(0.5);
+                    back();
+                    delay(0.5);
+                    back();
+                    delay(0.5);
+                }
                 delay(2);
             }
             sub(); //订阅
@@ -2986,6 +3005,13 @@ function rand_mode() {
         }
         while (!desc("工作").exists()) { //等待加载出主页
             console.info("等待加载主页");
+            if (text("排行榜").exists()) {
+                delay(0.5);
+                back();
+                delay(0.5);
+                back();
+                delay(0.5);
+            }
             delay(2);
         }
         if (rTime != 0 && articles == true) {
