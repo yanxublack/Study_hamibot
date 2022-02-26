@@ -1,9 +1,65 @@
 auto.waitFor();
 importClass(android.database.sqlite.SQLiteDatabase);
+importClass("java.security.SecureRandom");
+importClass("java.security.MessageDigest");
+importClass("javax.crypto.spec.DESKeySpec");
+importClass("javax.crypto.SecretKeyFactory");
+importClass("javax.crypto.Cipher");
+importClass("java.security.NoSuchAlgorithmException");
+importClass("javax.crypto.KeyGenerator");
+importClass("javax.crypto.SecretKey");
+importClass("javax.crypto.spec.SecretKeySpec");
+importClass("javax.crypto.KeyGenerator");
+importClass("javax.crypto.spec.IvParameterSpec");
+var config = {
+  iv: "abcdfui8701olkw4",
+  bm: "UTF-8",
+}
+for (var k in config) {
+  var v = config[k]
+  config[k] = new java.lang.String(v)
+}
+
+function javaDecrypt(ciphertext, privateKey) {
+  var keyb = privateKey.getBytes(config.bm); // byte[]
+  var md = MessageDigest.getInstance("SHA-256");
+  var thedigest = md.digest(keyb); // byte[]
+  var skey = new SecretKeySpec(thedigest, "AES");
+  var dcipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+  dcipher.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(config.iv.getBytes()));
+  var clearbyte = dcipher.doFinal(base64Decode(ciphertext));
+  return new java.lang.String(clearbyte);
+}
+
+function base64Decode(r) {
+  var r = android.util.Base64.decode(r, 0)
+  return r
+}
+
+function decrypt(ciphertext) {
+  var info = splitCiphertextAndPassword(ciphertext)
+  var privateKey = info.privateKey
+  var ciphertext = info.ciphertext
+  privateKey = new java.lang.String(privateKey)
+  ciphertext = new java.lang.String(ciphertext)
+  return javaDecrypt(ciphertext, privateKey).toString()
+}
+
+function splitCiphertextAndPassword(ciphertext) {
+  var firstThreeFigures = ciphertext.slice(0, 3)
+  var keyLength = parseInt(firstThreeFigures.slice(0, 1)) + parseInt(firstThreeFigures.slice(1, 2)) + parseInt(firstThreeFigures.slice(2, 3))
+  var privateKey = ciphertext.slice(100, 100 + keyLength)
+  var ciphertext = ciphertext.slice(100 + keyLength)
+  var result = {
+    privateKey: privateKey,
+    ciphertext: ciphertext
+  }
+  return result
+}
+
+
 var url = 'https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/QuestionBank.db';
-var urls = 'https://gitee.com/lctwelve/picture/raw/master/gfeyh1r2';
 var path = '/sdcard/QuestionBank.db';
-var paths = '/sdcard/tjvlff';
 var ends = 'e4a4-~e4a4-~d4g4-e4a4-~e4a4-~d4g4-e4a4c5-~e4a4-~d4g4-e4a4,g4c5d5,e4a4e5-~e4a4-~d4g4-e4a4-~e4a4-~d4g4-e4a4,e4a4c5,d4g4d5,d4g4e5,f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~a4d5-e4e5-a4g5-e4c6-a4b5~c6~e4b5~a5~a4g5-e4e5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4a4-c4g4~a4~f4c5-c4a4~d5~g4e5-d4d5~e5~g4g5~c6~d4e5~g5~a4c6-e4b5c6~b5~a4a5-e4g5-a4a5-e4-a4-e4c5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~a4d5-e4e5-a4g5-e4c6-a4b5~c6~e4b5~a5~a4g5-e4e5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5~c5~c4e5~g5~f4a5~g5~c4e5~d5~g4a4-d4c5-g4d5-d4e5-e4a4-~e4a4-~d4g4-e4a4,,e4a4-~e4~e4a4-~g4~e4a4-c5-e4c5-d5-f4a4-~f4~f4a4-~g4~d4a4-g4-d4e4-g4-e4a4-~e4~e4a4-~g4~e4a4-c5-e4d5-e5-f4e5,f4d5~e5~d5-g4c5,g4a4,e4a4-~e4~e4a4-~g4~e4a4-c5-e4c5-d5-f4a4-~f4~f4a4-~g4~d4a4-g4-d4g4-e4-e4a4-~e4~e4a4-~g4~e4a4-c5-e4d5-e5-f4e5,f4d5~e5~d5-g4c5,g4a4,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4,c4e4-g4-c4f4a4,d4g4d5,d4b4,e4a4c5,e4b4-g4-e4a4,e4,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4e4-g4-d4a4-d4a4,d4a4-e4a4c5,f4a4d5,e4a4b4,e4-e4,-a4-c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4f5-d4e5-g4d5-d4c5-g4c5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-f4f5-c4-f4e5-c4-g4d5-d4-g4c5-d4-c4f4d5-e5-d4g4b4-g4-e4a4,e4a4-g4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4f5-d4e5-g4d5-d4c5-g4c5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-f4f5-c4-f4e5-c4-g4d5-d4-g4c5-d4-c4f4d5-c5-d4g4e5-g5-e4a4a5,a4-e4-a4e5g5a5-e5a5-e5a5-e5a5-f4e5a5-e5a5-a5~g5~e5-g4a4c5d5-a4d5-a4d5-a4d5-e4a4d5-a4d5-d5~c5~a4-c4e4g4a4-e4a4-e4a4-e4a4-c4e4a4-e4a4-a4~g4~e4-d4-e4~d4~d4e4~g4~a4~c5~e4e5~g5~a5~c6~e4b5-a4~c5~e4a4e5~c5~a4~e5~e4a4~e5~c5~a4~e4a4e5~c5~a4~e5~e4a4~e5~c5~a4~d4f4f5~d5~a4~f5~d4f4~f5~d5~a4~d4f4f5~d5~a4~f5~d4f4~f5~d5~a4~c4f4f5~c5~a4~f5~c4f4~f5~c5~a4~c4f4f5~c5~a4~f5~c4f4~f5~c5~a4~d4g4d5~b4~g4~d5~d4g4~d5~b4~g4~e4g4e5~b4~g4~e5~e4g4~e5~b4~g4~e4a4e5~c5~a4~e5~e4a4a5~e5~c5~a4~e4a4d5~c5~a4~e5~e4a4b5~c6~a5~e5~d4f4f5~d5~a4~f5~d4f4a5~f5~d5~a4~d4f4f5~d5~a4~f5~d4f4b5~c6~a5~f5~c4f4f5~c5~a4~f5~c4f4a5~f5~c5~a4~c4f4f5~c5~a4~f5~c4f4b5~c6~f5~c5~d4g4d5~b4~g4~d5~d4g4g5~d5~b4~d5~e4g4e5~b4~e5~a5~e4g4b5~a5~e5~a5~c4f4b5~c6~a5~c6~c4f4b5~a5~g5~e5~d4g4d5~e5~c5~e5~d4g4d5~c5~b4~a4~e4a4e5~d5~c5~e5~e4a4d5~c5~b4~c5~e4a4,e4,c4f4a4-b4-c4f4c5-e5-d4g4d5~e5~a5~b5~d4g4c6~b5~a5~b5~e4a4e5,e4a4-g5-e4a4e5,e4a4,c4f4a4~a4~g4~g4~c4f4d5~d5~c5~c5~d4g4e5~e5~d5~d5~d4g4a5~a5~g5~g5~e4a4d5-c5-e4a4e5~g5~e5~g5~e4a4e5,e4a4,c4f4c5-a4~f4~c4~f4~a4~c5~d4g4d5-b4~g4~d4~g4~b4~d5~e4b4e5-~e4b4d5-~e4b4e5~d5~e4b4e5,,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4,c4e4-g4-c4f4a4,d4g4d5,d4b4,e4a4c5,e4b4-g4-e4a4,e4,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4e4-g4-d4a4-d4a4,d4a4-e4a4c5,f4a4d5,e4a4b4,e4-e4,-a4-c5-e4a4d5-~d5-~e5-c4f4e5,-e5-d4g4g5-a5-d5-c5-c4g4e5,a4-c5-e4a4d5-~d5-~e5-c4f4e5,-e5-d4g4f5-e5-d5-c5-c4g4c5,a4-c5-e4a4d5-~d5-~e5-c4f4e5,-e5-d4g4g5-a5-d5-c5-c4g4e5,a4-c5-c4f4f5,e5,d4g4d5,c5,c4f4d5-e5-d4g4d5-e5-e4a4e5,e4a4-g4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4f5-d4e5-g4d5-d4c5-g4c5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-c4f4f5,e5,d4g4d5,c5,c4f4d5-c5-d4g4e5-g5-e4a4a5~a5~e4a5~a5~a4a5-e4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~a4d5-e4e5-a4g5-e4c6-a4b5~c6~e4b5~a5~a4g5-e4e5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5~c5~c4e5~g5~f4a5~g5~c4e5~d5~g4a4-d4c5-g4d5-d4e5-e4a4-~e4a4-~d4g4-e4a4,-e5~g5~e4a4e5a5-~e4a4e5a5-~d4g4d5g5-e4a4e5a5';
 device.wakeUpIfNeeded(); //点亮屏幕
 check();
@@ -25,7 +81,7 @@ var 每周答题下滑 = hamibot.env.selectm;
 
 var 订阅 = hamibot.env.ssub;
 
-var 随机 = hamibot.env.suiji;
+// var 随机 = hamibot.env.suiji;
 
 var 延迟时间 = hamibot.env.delay * 1;
 var stronger = hamibot.env.stronger; //每日答题增强模式
@@ -119,7 +175,9 @@ function get_ocr() {
     try {
         ocr = plugins.load('com.hraps.ocr');
     } catch (e) {
-        console.error('第三方ocr识别插件未安装！！！，脚本结束');
+        console.error('第三方ocr识别插件未安装！！！');
+        console.info('正在跳转浏览器链接,密码：habv');
+        app.openUrl('https://wws.lanzoux.com/iduulmofune');
         exit();
     }
 }
@@ -127,7 +185,7 @@ function get_ocr() {
 function get_hamibot_ocr() {
     console.info("你选择了hamibot内置文字识别（OCR）");
     if (app.versionName < "1.3.0-beta.1") {
-        console.error("请去hamibot官网下载版本1.3.0以上的hamibot！！！，脚本结束");
+        console.error("请去hamibot官网下载版本1.3.0以上的hamibot(下载测试版)！！！，脚本结束");
         exit();
     }
 }
@@ -170,37 +228,11 @@ if (siren == true || 订阅 != 'a' || stronger != 'a') {
             files.writeBytes(path, tiku);
         });
     }
-    if (!files.exists(paths)) {
-        //toastLog('没有题库,正在下载题库，请等待！！！');
-        threads.start(function () {
-            var tiku = http.get(urls).body.bytes();
-            //console.log(tiku)
-            files.writeBytes(paths, tiku);
-        });
-    } else {
-        threads.start(function () {
-            try{
-                var data = files.read(paths);
-                var len = http.get('https://gitee.com/lctwelve/picture/raw/master/length').body.string();
-                if (data.length != len){
-                    files.remove(paths);
-                    var tiku = http.get(urls).body.bytes();
-                    files.writeBytes(paths, tiku);
-                }
-            }
-            catch(e){}
-        });
-    }
-    // if(!files.exists('/sdcard/订阅.png')){
-    //     var pic = http.get('https://gitee.com/lctwelve/picture/raw/master/订阅.png').body.bytes();
-    //     files.writeBytes('/sdcard/订阅.png', pic);    
-    // }
-
     launchApp("Hamibot");
     delay(2);
     threads.start(function () {
         if (!requestScreenCapture(false)) {
-            toastLog("请求截图失败,重新运行");
+            toastLog("请求截图失败,脚本结束");
             exit();
         }
     });
@@ -228,9 +260,6 @@ if (siren == true || 订阅 != 'a' || stronger != 'a') {
 
 var lCount = 1; //挑战答题轮数
 var qCount = 5; //挑战答题每轮答题数
-var ZiXingTi = "选择词语的正确词形。"; //字形题
-var DuYinTi = "选择正确的读音。"; //读音题 20201211
-var ErShiSiShi = "下列不属于二十四史的是。"; //二十四史
 
 var asub = 2; //订阅数
 var aCount = 6; //文章默认学习篇数
@@ -247,7 +276,11 @@ var aTime = hamibot.env.time1; //有效阅读一分钟1分*6
 var vTime = hamibot.env.time2; //每个小视频学习-5秒
 var rTime = 370; //广播收听6分 * 60 = 360秒
 
-
+var 点点通 = {
+    '有效视听':0,
+    '有效浏览':0,
+    '挑战答题':0
+};
 var myScores = {}; //分数
 var article_list = [];
 var delay_time = 1000;
@@ -468,7 +501,8 @@ function articleStudy(x) {
     var zt_flag = false; //判断进入专题界面标志
     var fail = 0; //点击失败次数
 
-    for (var i = 0, t = 0; i < aCount;) {
+    for (var i = 0, t = 0; i < aCount+点点通['有效浏览']*6;) {
+        if(i>6||aCount==0) aTime = 6;
         try {
             if ((text('播报').findOnce(t).parent().parent().parent().child(0).parent().parent().click()) == true) {
                 delay(3);
@@ -580,7 +614,7 @@ function articleStudy(x) {
             delay(1.5);
         }
     }
-
+    aTime = hamibot.env.time1;
 }
 
 /**
@@ -1673,22 +1707,19 @@ function getAnswer(question) {
     var question1 = question.split('来源：')[0]; //去除来源
     question1 = question1.replace(/ /g, '');//再删除多余空格
     question1 = question1.replace(/  /g, '');
-    var q = ''
-    for(var i = 0;i<question1.length;i++){
-        q += question1[i];
-        q+='%';
-    }
-    //log('搜索题目：' + question1);
     try{
-        var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
-        var sql = "SELECT answer FROM questionrecord WHERE question LIKE '%" + q + "%'";
-        var cursor = db.rawQuery(sql, null);
-        if (cursor.moveToFirst()) {
-            var answer = cursor.getString(0);
-            return answer;
-        }else{
-            return '';
+        var option = '';
+        var similars = 0;
+        var pos = -1;
+        for(var i = 0;i<question_list.length;i++){
+            var s = similarity(question_list[i][0],question1,0);
+            if(s>similars){
+                similars = s;
+                pos = i;
+            }
         }
+        option = question_list[pos][1];
+        return option;
     }catch(e){
         question1 = question;
         question1 = question1.split('来源：')[0]; //去除来源
@@ -1913,6 +1944,7 @@ function challengeQuestionLoop(conNum) {
  * @return: null
  */
 function challengeQuestion() {
+    init();
     if (!className("RadioButton").exists()) {
         while (!text("排行榜").exists()) {
             console.info("等待我要答题界面");
@@ -1965,16 +1997,6 @@ function challengeQuestion() {
                 delay(1);
                 back();
                 delay(2);
-                // delay(2);
-                // back();
-                // delay(2);
-                // back();
-                // delay(2);
-                // if (textContains("再来一局").exists()) {
-                //     back();
-                // }
-                // back();
-                break;
             } else {
                 if (复活) {
                     复活 = false;
@@ -1983,7 +2005,7 @@ function challengeQuestion() {
                     back();
                     delay(1);
                 } else {
-                    console.log("出现错误，等5秒开始下一轮...")
+                    console.log("等5秒开始下一轮...")
                     delay(3); //等待3秒才能开始下一轮
                     // back();
                     // //desc("结束本局").click();//有可能找不到结束本局字样所在页面控件，所以直接返回到上一层
@@ -1993,7 +2015,6 @@ function challengeQuestion() {
                     conNum = 0;
                     复活 = true;
                 }
-
             }
         } else //答对了
         {
@@ -2032,7 +2053,6 @@ function check() {
             flag2 = 2;
         }
     });
-    // delay(2);
     while (true) {
         if (flag1 == 1 || flag2 == 1){
             threads.shutDownAll();
@@ -2047,12 +2067,9 @@ function check() {
         }
         else if (flag1 == 2 && flag2 == 2) break;
     }
-    // if(flag1 == 1|| flag2 == 1) return 0;
-
     console.error('可能有更新嗷，下次见。。。。');
     exit();
 }
-var num = ['A', 'B', 'C', 'D'];
 
 function do_contest_answer(depth_option, question1) {
     // console.time('搜题');
@@ -2063,18 +2080,20 @@ function do_contest_answer(depth_option, question1) {
     question = question1.split('A.')[0];
     question = question.split('c')[0];
     question = question.split('C')[0];
-    question = question.split('（')[0];
+    question = question.split('（.*）')[0];
     reg = /下列..正确的是.*/g;
     reb = /选择词语的正确.*/g;
     rea = /选择正确的读音.*/g;
+    var 音字 = false;
     if (reg.test(question) || rea.test(question) || reb.test(question)) {
-        var answers_list = [];
+        音字 = true;
+        var answers_list = '';
         first = false;
         try {
             var old_answers = old_question.split('A.')[1].split('C')[0];
             for (var k = 0; k < 2; k++) {
                 answers = old_answers.split('B.')[k];
-                answers = answers.match(/[\u4e00-\u9fa5]/g).join(""); //剩余汉字
+                // answers = answers.match(/[\u4e00-\u9fa5]/g).join(""); //剩余汉字
                 answers = answers.replace(/美轮美./g, "美轮美奂");
                 answers = answers.replace(/决穿/g, "诀窍");
                 answers = answers.replace(/浙临/g, "濒临");
@@ -2118,89 +2137,28 @@ function do_contest_answer(depth_option, question1) {
                 try{
                     answers = r.replace(answers);
                 }catch(e){}
-                var tmp = answers;
-                answers = '';
-                for (var i = 0; i < tmp.length; i++) {
-                    answers += tmp[i];
-                    answers += "%";
-                }
-                answers_list.push(answers);
+                answers_list += answers;
             }
-            // console.log(answers);
         } catch (e) {
             while (!className('android.widget.RadioButton').depth(32).exists()) {
                 if (text('继续挑战').exists()) return -1;
             }
             return -2;
         };
-        try {
-            for (var i = 0; i < answers_list.length; i++) {
-                var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
-                var mm = "";
-                if(question.indexOf("词") != -1){
-                    mm = '词';
-                }
-                else if(question.indexOf("音") != -1){
-                    mm = '音';
-                }
-                var sql = "SELECT answer FROM questionrecord WHERE (question like '%" + mm + "%') and answers LIKE '%" + answers_list[i] + "%'";
-                var cursor = db.rawQuery(sql, null);
-                if (cursor.moveToFirst()) {
-                    var answer = cursor.getString(0);
-                    cursor.close();
-                    if (answer[0] >= 'A' && answer[0] <= 'D') {
-                        console.info('点击答案:' + answer[0]);
-                        if (text('继续挑战').exists()) return -1;
-                        while (!className("ListView").exists()) {
-                            // className('android.widget.RadioButton').findOnce(answer[0].charCodeAt(0) - 65).click();
-                            if (text('继续挑战').exists()) return -1;
-                        }
-                        if (text('继续挑战').exists()) return -1;
-                        try {
-                            while(!className("ListView").findOne(5000).child(answer[0].charCodeAt(0) - 65).child(0).click()){
-                                if (text('继续挑战').exists()) return -1;
-                            };
-                        } catch (e) {
-                            console.error(e);
-                            while (!className('android.widget.RadioButton').depth(depth_option).exists()) {
-                                if (text('继续挑战').exists()) return -1;
-                            }
-                            className('android.widget.RadioButton').depth(depth_option).findOnce(answer[0].charCodeAt(0) - 65).click();
-                        }
-                        console.log('点击完成');
-                        return 0;
-                    }
-                }
+        var option = '';
+        var answer = '';
+        var similars = 0;
+        var pos = -1;
+        for(var i = 0;i<question_list.length;i++){
+            var s = similarity(question_list[i][2],answers_list,1);
+            if(s>similars){
+                similars = s;
+                pos = i;
             }
-            cursor.close();
-            console.info('没找到,有错字');
-            while (!className('android.widget.RadioButton').exists()) {
-                if (text('继续挑战').exists()) return -1;
-            }
-            
-            // 如果没找到结果则选择第一个
-            try {
-                className("ListView").findOne(延迟时间).child(0).child(0).click();
-            } catch (e) {
-                console.error(e);
-                while (!className('android.widget.RadioButton').depth(depth_option).exists()) {
-                    if (text('继续挑战').exists()) return -1;
-                }
-                className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
-            }
-            return 0;
-        } catch (e) {
-            cursor.close();
-            console.info('没找到');
-            while (!className('android.widget.RadioButton').exists()) {
-                if (text('继续挑战').exists()) return -1;
-            }
-            className('android.widget.RadioButton').findOnce(0).click();
-            return 0;
         }
-
+        option = question_list[pos][1];
+        answer = question_list[pos][2];
     } else {
-        // var questions = '';
         var option = '';
         var answer = '';
         var similars = 0;
@@ -2214,58 +2172,46 @@ function do_contest_answer(depth_option, question1) {
         }
         option = question_list[pos][1];
         answer = question_list[pos][2];
-        // console.timeEnd('搜题');
-        // log(question);
-        // log(answer);
-        // log(max);
-        if (pos == -1) console.error('没搜到答案');
-        if (option[0] >= 'A' && option[0] <= 'D') {
-            if(answer.indexOf('	') != -1){
-                var tmpx = answer.split('	')[option[0].charCodeAt(0) - 65];
-            }
-            else{
-                var tmpx = answer.split(' ')[option[0].charCodeAt(0) - 65];
-            }
-            console.info('点击答案:' + option + '.' + tmpx);
+    }
+    if (pos == -1) console.error('没搜到答案');
+    if (option[0] >= 'A' && option[0] <= 'D') {
+        console.info('点击答案:' + option + '.' + answer.split('	')[option[0].charCodeAt(0) - 65]);
+        if (text('继续挑战').exists()) return -1;
+        while (!className("ListView").exists()) {
+            // className('android.widget.RadioButton').findOnce(answer[0].charCodeAt(0) - 65).click();
             if (text('继续挑战').exists()) return -1;
-            while (!className("ListView").exists()) {
-                // className('android.widget.RadioButton').findOnce(answer[0].charCodeAt(0) - 65).click();
+        }
+        if (text('继续挑战').exists()) return -1;
+        if(!first && !音字)
+        sleep(延迟时间);
+        first = false;
+        try {
+            while(!className("ListView").findOne(5000).child(option[0].charCodeAt(0) - 65).child(0).click()){
                 if (text('继续挑战').exists()) return -1;
             }
-            if (text('继续挑战').exists()) return -1;
-            if(!first)
-            sleep(延迟时间);
-            first = false;
-            try {
-                while(!className("ListView").findOne(5000).child(option[0].charCodeAt(0) - 65).child(0).click()){
-                    if (text('继续挑战').exists()) return -1;
-                };
-            } catch (e) {
-                // console.error(e);
-                while (!className('android.widget.RadioButton').depth(depth_option).exists()) {
-                    if (text('继续挑战').exists()) return -1;
-                }
-                try{
-                    className('android.widget.RadioButton').depth(depth_option).findOnce(option[0].charCodeAt(0) - 65).click();
-                }catch(e){
-                    console.error('没找到答案,选A跳过');
-                    className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
-                }  
+        } catch (e) {
+            // console.error(e);
+            while (!className('android.widget.RadioButton').depth(depth_option).exists()) {
+                if (text('继续挑战').exists()) return -1;
             }
-            // console.log('点击完成');
-            return 0;
+            try{
+                className('android.widget.RadioButton').depth(depth_option).findOnce(option[0].charCodeAt(0) - 65).click();
+            }catch(e){
+                console.error('没找到答案,选A跳过');
+                className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
+            }  
         }
-        className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
         return 0;
     }
+    className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
+    return 0;
 }
 function similarity(question, q,flag) {
     var num = 0;
     if(flag){
-        q = q.match(/[\u4e00-\u9fa5]/g).join("");
         for(var i = 0;i<q.length;i++){
           if(question.indexOf(q[i])!=-1){
-              num++;
+                num++;
           }
         }
     }
@@ -2374,31 +2320,26 @@ function huawei_ocr_api(img,tokens) {
  * @return: null
  */
 var question_list = [];
+var init_true = false;
 function init(){
-    var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
-    var sql = "SELECT * FROM questionrecord" ;
-    var cursor = db.rawQuery(sql, null);
-    while (cursor.moveToNext()){
-        if(cursor.getString(1).length>1) continue;
-        // quesion option answer
-        question_list.push([cursor.getString(2).replace(/（.*）/g,'').replace(/_/g,'').split('来源：')[0], cursor.getString(1), cursor.getString(3)])
+    if(init_true) return;
+    try{
+        var tikus = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/question').body.string();
+        tikus = decrypt(decrypt(tikus));
+        tikus = tikus.split('\n');
+        for(var i = 0 ;i<tikus.length;i++){
+            var t = tikus[i].split(' ');
+            question_list.push([t[1],t[0],t[2]]);
+        }
+        tikus = null;
+        init_true = true;
+    }
+    catch(e){
+        console.error('题库获取失败，检测网络连接！！！');
+        exit();
     }
 }
 function zsyAnswer() {
-    if (!files.exists(paths)) {
-        console.error('请检测手机对hamibot的存储权限！！！\n脚本结束');
-        exit();
-    }
-    try{
-        var db = SQLiteDatabase.openOrCreateDatabase(paths, null);
-        var sql = "SELECT * FROM questionrecord WHERE question LIKE '中国%'";
-        var cursor = db.rawQuery(sql, null);
-        if (cursor.moveToFirst()) {}
-    }catch(e){
-        console.error('检测到搜题异常，建议重启一次脚本!!!\n脚本结束')
-        if (files.exists(paths)) {files.remove(paths);}
-        exit();
-    }
     var img = captureScreen();
     try{
         var point = findColor(img, '#1B1F25', {
@@ -2479,11 +2420,6 @@ function zsyAnswer() {
             question = question.slice(question.indexOf('.') + 1);
             question = question.replace(/,/g, "，");
             log(question);
-            //className('android.widget.RadioButton').depth(32).waitFor();
-            // while(!className('android.widget.RadioButton').depth(32).exists()){
-            //     if(text('继续挑战').exists()) break;
-            // }
-            // if(text('继续挑战').exists()) break;
             if (question) {
                 var c = do_contest_answer(32, question);
                 if (c == -1) {
@@ -2505,7 +2441,6 @@ function zsyAnswer() {
                     threshold: 10,
                 });
             } while (!point);
-            // console.log('等待下一题');
         }
         if (i == 0 && count == 2) {
             sleep(random_time(delay_time));
@@ -2699,12 +2634,12 @@ function main() {
 }
 
 //运行主函数
-if (随机) {
-    rand_mode();
-} else {
-    main();
-}
-
+// if (随机) {
+    
+// } else {
+//     main();
+// }
+rand_mode();
 function push_score(){
     console.warn('正在获取今日积分');
     var score = getScores(3);
@@ -2752,6 +2687,7 @@ function rand_mode() {
     console.info('随机模式开始');
     getScores(0); //获取积分
     re_store();
+    diandian();
     var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];;
     var t;
     for (var i = 0; i < arr.length; i++) {
@@ -2879,7 +2815,7 @@ function rand_mode() {
 
     function 挑战() {
         // tzCount = 1;
-        if (tzCount != 0 && tiaozhan == true) {
+        if ((tzCount != 0||点点通['挑战答题']) && tiaozhan == true) {
             console.info('开始挑战答题');
             if (!text("排行榜").exists()) {
                 console.info("进入我要答题");
@@ -2927,7 +2863,8 @@ function rand_mode() {
             }
             delay(2);
         }
-        while (vCount != 0 && video != 'a') {
+        while ((vCount != 0|| 点点通['有效视听']) && video != 'a') {
+            vCount = vCount + 6*点点通['有效视听'];
             console.error('当前第' + x + '次看视频');
             if (video == 'b')
                 videoStudy_news(x); //看视频
@@ -2937,6 +2874,7 @@ function rand_mode() {
             console.info("等待五秒，然后确认视频是否已满分。");
             delay(5);
             getScores(2);
+            diandian();
             x++;
             if (x > 2) { //尝试三次
                 console.info("尝试2次，跳过。");
@@ -3026,11 +2964,12 @@ function rand_mode() {
         }
         var r_start = new Date().getTime(); //广播开始时间
         var x = 0;
-        while (aCount != 0 && articles == true) {
+        while ((aCount != 0||点点通['有效浏览']) && articles == true) {
             articleStudy(x); //学习文章，包含点赞、分享和评论
             console.info("等待五秒，然后确认文章是否已满分。");
             delay(5);
             getScores(1);
+            diandian();
             x++;
             if (x > 2) { //尝试三次
                 console.info("尝试3次未满分，暂时跳过。");
@@ -3045,5 +2984,38 @@ function rand_mode() {
                 stopRadio();
             }
         }
+
+    }
+    function diandian(){
+        if(hamibot.env.diandian == null||hamibot.env.diandian == false) return;
+        while (!desc("工作").exists()) { //等待加载出主页
+            console.info("等待加载主页");
+            delay(1);
+        }
+        console.info('正在刷点点通');
+        text("我的").click();
+        console.log('正在查看点点通分数');
+        delay(1);
+        text("强国城").findOne().parent().click();
+        delay(2);
+        text("点点通明细").findOne().parent().click();
+        delay(2);
+        while(!textContains('+').exists()){delay(0.5);}
+        var list = textContains('+').findOne(5000);
+        list = list.parent().parent();
+        for(var i=1;i<list.childCount();i++){
+            var name = list.child(i).child(2).text();
+            var s  = list.child(i).child(3).text().replace('+',"").replace('点','');
+            if(!点点通[name])点点通[name] = 0;
+            点点通[name]+=Number(s);
+        }
+        点点通['挑战答题'] = 3-点点通['挑战答题']/3;
+        点点通['有效视听'] = 2-点点通['有效视听']/6;
+        点点通['有效浏览'] = 2-点点通['有效浏览']/6;
+        console.info('挑战答题:'+点点通['挑战答题']+'个');
+        console.info('视频学习:'+点点通['有效视听']*6+'个');
+        console.info('文章学习:'+点点通['有效浏览']*6+'个');
+        lCount = 点点通['挑战答题'];
+        back_table();
     }
 }
