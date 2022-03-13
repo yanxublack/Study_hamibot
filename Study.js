@@ -180,18 +180,24 @@ function get_token() {      // 华为ocr
     } else {
         console.info('华为文字识别（OCR）配置正确');
     }
-    console.error('注意：华为OCR已经需要付费了！！！');
     return res.headers['X-Subject-Token'];
 }
 
+function getVersion(package_name) {         // 得到包名的版本
+    let pkgs = context.getPackageManager().getInstalledPackages(0).toArray();
+    for (let i in pkgs) {
+        if (pkgs[i].packageName.toString() === package_name) {
+            return pkgs[i].versionName;
+        }
+    }
+}
 function get_ocr() {
     console.info("你选择了第三方文字识别（OCR）");
     try {
         ocr = plugins.load('com.hraps.ocr');
     } catch (e) {
-        console.error('第三方ocr识别插件未安装！！！');
-        console.info('正在跳转浏览器链接,密码：habv');
-        app.openUrl('https://wws.lanzoux.com/iduulmofune');
+        console.error('未安装OCR插件，正在跳转浏览器下载\n密码:7faj');
+        app.openUrl('https://twelve123.lanzouq.com/b017az0kj');
         exit();
     }
 }
@@ -296,18 +302,18 @@ function show_log(){
                 positive: "关闭",
             }).on("positive", ()=>{
                 d.dismiss();
-                setClip(text);
+                // setClip(text);
                 d = null;
                 text = null;
                 showlog = true;
             }).show();
             sleep(20000);
             if(!showlog){
-            d.dismiss();
-            setClip(text)
-            d = null;
-            text = null;
-            showlog = true;
+                d.dismiss();
+                // setClip(text)
+                d = null;
+                text = null;
+                showlog = true;
             }
         }
         catch(e){
@@ -1103,7 +1109,7 @@ function sub() {
     click("添加");
     delay(3);
     if(!desc('推荐').exists()){
-        console.info('没有找到，可能你的xxqg不是2.33及以下版本，跳过订阅！！！');
+        console.info('没有找到，可能你的xxqg不是2.33及以下版本，不支持订阅！！！');
         back();
         delay(1);
         back_table();
@@ -1130,7 +1136,7 @@ function sub() {
                     break;
                 } else old_names = names;
             } catch (e) {
-                if (list.childCount() < 5) break;
+                if (list!=null && list.childCount() < 5) break;
             }
             //toastLog(names);
         }
@@ -1164,7 +1170,7 @@ function sub() {
                     break;
                 } else old_names = names;
             } catch (e) {
-                if (list.childCount() < 5) break;
+                if (list!=null && list.childCount() < 5) break;
             }
         }
         if (订阅 == 'c') break;
@@ -1978,8 +1984,11 @@ function challengeQuestionLoop(conNum) {
             var listDescStr = item.child(0).child(1).text();
             if (listDescStr == answer) {
                 delay(random(0.5, 1)); //随机延时0.5-1秒
-                item.child(0).click(); //点击答案
-                hasClicked = true;
+                try{
+                    item.child(0).click(); //点击答案
+                    hasClicked = true;
+                }
+                catch(e){}
                 delay(0.5); //等待0.5秒，是否出现X
                 if (!text("v5IOXn6lQWYTJeqX2eHuNcrPesmSud2JdogYyGnRNxujMT8RS7y43zxY4coWepspQkvw" +
                         "RDTJtCTsZ5JW+8sGvTRDzFnDeO+BcOEpP0Rte6f+HwcGxeN2dglWfgH8P0C7HkCMJOAAAAAElFTkSuQmCC").exists() || text("再来一局").exists()) //遇到❌号，则答错了,不再通过结束本局字样判断
@@ -2167,13 +2176,14 @@ function do_contest_answer(depth_option, question1) {
     reb = /选择词语的正确.*/g;
     rea = /选择正确的读音.*/g;
     rec = /下列不属于二十四史的是.*/g;
+    rex = /劳动行政部门自收到集体合同文本之日起.*/g;
     var 音字 = false;
     var option = 'N';
     var answer = 'N';
     var similars = 0;
     var pos = -1;
     var answers_list = '';
-    if (rec.test(question) || reg.test(question) || rea.test(question) || reb.test(question)) {
+    if (rex.test(question) ||rec.test(question) || reg.test(question) || rea.test(question) || reb.test(question)) {
         音字 = true;
         first = false;
         try {
@@ -2233,13 +2243,15 @@ function do_contest_answer(depth_option, question1) {
             return -2;
         };
     }
+    if(音字) question = answers_list;
     for(var i = 0;i<question_list.length;i++){          // 搜题
-        if(音字) var s = similarity(question_list[i][2],answers_list,1);
-        else var s = similarity(question_list[i][0],question,0);
+        // question answer q flag
+        var s = similarity(question_list[i][0],question_list[i][2],question,音字);
         if(s>similars){
             similars = s;
             pos = i;
         }
+        if(s == 999) break;
     }
     if(pos != -1){
         option = question_list[pos][1];
@@ -2278,11 +2290,20 @@ function do_contest_answer(depth_option, question1) {
     className('android.widget.RadioButton').depth(depth_option).findOnce(0).click();
     return 0;
 }
-function similarity(question, q,flag) {
+function similarity(question,answer, q,flag) {
     var num = 0;
     if(flag){
+        if(q.indexOf('十五日')!=-1 && question.indexOf('劳动行政部门自收到集体合同文本之日起')!=-1 && answer.split('\t')[0].indexOf('十日')!=-1){
+            return 999;
+        }
+        if(q.indexOf('十五日')==-1 && q.indexOf('十日')!=-1 && question.indexOf('劳动行政部门自收到集体合同文本之日起')!=-1 && answer.split('\t')[0].indexOf('五日')!=-1){
+            return 999;
+        }
+        if(question.indexOf('正确')==-1 && question.indexOf('下列不属于二十四史的')==-1){
+            return 0;
+        }
         for(var i = 0;i<q.length;i++){
-          if(question.indexOf(q[i])!=-1){
+          if(answer.indexOf(q[i])!=-1){
                 num++;
           }
         }
@@ -2347,7 +2368,14 @@ function ocr_api(img) {
         return answer.replace(/\s*/g, "");
     }catch(e){
         console.error(e);
-        console.info("你可能使用了hamibot1.3.0及以上的版本，此版本不支持第三方本地ocr，请下载hamibot1.1.0版本");
+        if(e.toString().indexOf('is 32-bit instead of 64-bit')!=-1){
+            console.info('当前设备环境不支持32位，去下载64位的第三方插件');
+        }
+        if(e.toString().indexOf('is 64-bit instead of 32-bit')!=-1){
+            console.info('当前设备环境不支持64位，去下载32位的第三方插件');
+        }
+        console.error('密码:7faj');
+        app.openUrl('https://twelve123.lanzouq.com/b017az0kj');
         exit();
     }
     
@@ -2610,6 +2638,7 @@ function zsyAnswer() {
                     threshold: 10,
                 });
             } while (!point);
+            console.log('等待下一题');
         }
         if (i == 0 && count == 2) {
             sleep(random_time(delay_time));
@@ -2618,8 +2647,14 @@ function zsyAnswer() {
             sleep(random_time(delay_time));
         }
     }
-    if(hamibot.env.another == true){
-        console.warn('额外一轮即将开始!');
+    if(hamibot.env.another)
+        var x = hamibot.env.another*1;
+    else
+        var x = 0;
+    while(x>0){
+        console.info('额外的 '+ x +' 轮即将开始!');
+        x--;
+        delay(2);
         click('继续挑战');
         delay(2);
         if (text("随机匹配").exists()) {
@@ -2653,10 +2688,10 @@ function zsyAnswer() {
             if (text('继续挑战').exists()) break;
             sleep(200);
         }
-        console.warn('额外一轮结束!');
+        // console.warn('额外一轮结束!');
     }
     console.info('答题结束');
-    delay(1);
+    delay(2);
     back();
     delay(2);
     back();
@@ -2808,7 +2843,35 @@ function main() {
 // } else {
 //     main();
 // }
-rand_mode();
+if(hamibot.env.restart){
+    console.info('遇到错误则自动重启脚本-开启');
+    while(true){
+        try{
+            rand_mode();
+            break;
+        }catch(e){
+            if(e.toString().indexOf('ScriptInterruptedException')!=-1){
+                exit();
+            }
+            console.error(e);
+            console.info('程序异常结束！！！，正在自动重启程序');
+            if (!(launchApp("学习强国") || launch('cn.xuexi.android'))) //启动学习强国app
+            {
+                back_table();
+                delay(1);
+            }
+            else{
+                console.error('未找到xxqg,脚本结束');
+                hamibot.exit();
+                exit();
+            }
+        }
+    }
+}
+else{
+    rand_mode();
+}
+
 function push_score(){
     console.warn('正在获取今日积分');
     var score = getScores(3);
@@ -2842,6 +2905,11 @@ function back_table() {
         console.info("当前没有在主页，正在返回主页");
         back();
         delay(1);
+        if(hamibot.env.restart && className('Button').textContains('退出').exists()){
+            var c = className('Button').textContains('退出').findOne(3000);
+            if(c) c.click();
+            delay(1);
+        }
     }
     // console.info('当前在主页，回到桌面！');
     // home();  //回到桌面
