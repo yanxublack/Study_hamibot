@@ -93,10 +93,10 @@
       "a": "华为OCR接口,需要填入以下关于华为的内容",
       "d": "百度OCR接口,需要填入以下关于百度的内容",
       "c": "hamibot内置OCR(速度快-hamibot v1.3以上)->推荐",
-      "b": "第三方OCR插件,需要安装第三方插件(速度适中-hamibot v1.1)"
+      "b": "第三方OCR插件,需要安装第三方插件->推荐"
     },
     "validation": "required",
-    "help": "注：一般手机本地识别速度大于云端，部分手机内置ocr识别较慢，请自行测试三种ocr"
+    "help": "注：一般手机本地识别速度大于云端，部分手机内置ocr识别较慢，请自行测试"
   },
   {
     "name": "AK",
@@ -153,10 +153,16 @@
     "help": "https://hamibot.com/marketplace/1Kw2X?invite=ONTRWIBaZqdBWuDk6DNzT7rt"
   },
   {
-    "name": "suiji",
+    "name": "diandian",
     "type": "checkbox",
-    "label": "随机模式",
-    "help": "帮助:开启后学习顺序随机进行。"
+    "label": "点点通刷满",
+    "help": ""
+  },
+  {
+    "name": "restart",
+    "type": "checkbox",
+    "label": "遇到错误则自动重启脚本（测试中）",
+    "help": ""
   },
   {
     "name": "time1",
@@ -180,8 +186,8 @@
   },
   {
     "name": "another",
-    "type": "checkbox",
-    "label": "四人/双人额外进行一次随机答题(乱答)",
+    "type": "number",
+    "label": "四人/双人额外的随机答题次数(乱答)",
     "help": ""
   },
   {
