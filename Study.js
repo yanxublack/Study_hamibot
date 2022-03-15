@@ -2124,42 +2124,48 @@ function challengeQuestion() {
 //挑战答题
 //////////////////////////////////////////////////////////////////
 function check() {
-    var flag1 = 0,
-        flag2 = 0;
-    http.__okhttp__.setTimeout(10000);
-    threads.start(function () {
-        try {
-            var get = http.get('https://gitee.com/lctwelve/picture/raw/master/check.txt').body.string();
-            if (get == ends) flag1 = 1;
-            else flag1 = 2;
-        } catch (e) {
-            flag1 = 2;
-        }
-    });
-    threads.start(function () {
-        try {
-            var get = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/check.txt').body.string();
-            if (get == (ends + '\n')) flag2 = 1;
-            else flag2 = 2;
-        } catch (e) {
-            flag2 = 2;
-        }
-    });
-    while (true) {
-        if (flag1 == 1 || flag2 == 1){
-            threads.shutDownAll();
-            threads.start(function () {
-                try{
-                    var x = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/replace.js').body.string();
-                    files.write('/sdcard/replace.js', x);
-                    r = require('/sdcard/replace.js');
-                }catch(e){}
-            });
-            return 0;
-        }
-        else if (flag1 == 2 && flag2 == 2) break;
+    // var flag1 = 0,
+    //     flag2 = 0;
+    // http.__okhttp__.setTimeout(10000);
+    // threads.start(function () {
+    //     try {
+    //         var get = http.get('https://gitee.com/lctwelve/picture/raw/master/check.txt').body.string();
+    //         if (get == ends) flag1 = 1;
+    //         else flag1 = 2;
+    //     } catch (e) {
+    //         flag1 = 2;
+    //     }
+    // });
+    // threads.start(function () {
+    //     try {
+    //         var get = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/check.txt').body.string();
+    //         if (get == (ends + '\n')) flag2 = 1;
+    //         else flag2 = 2;
+    //     } catch (e) {
+    //         flag2 = 2;
+    //     }
+    // });
+    var get = http.get('https://gitee.com/lctwelve/picture/raw/master/check.txt').body.string();
+    if (get == ends){
+        return 0;
     }
-    console.error('可能有更新嗷，下次见。。。。');
+    // while (true) {
+    //     if (flag1 == 1 || flag2 == 1){
+    //         threads.shutDownAll();
+    //         threads.start(function () {
+    //             try{
+    //                 var x = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/replace.js').body.string();
+    //                 files.write('/sdcard/replace.js', x);
+    //                 r = require('/sdcard/replace.js');
+    //             }catch(e){}
+    //         });
+    //         return 0;
+    //     }
+    //     else if (flag1 == 2 && flag2 == 2) break;
+    // }
+    show_log();
+    while(!showlog){sleep(1000);};
+    // console.error('可能有更新嗷，下次见。。。。');
     exit();
 }
 
@@ -2191,6 +2197,13 @@ function do_contest_answer(depth_option, question1) {
             for (var k = 0; k < 2; k++) {
                 answers = old_answers.split('B.')[k];
                 // answers = answers.match(/[\u4e00-\u9fa5]/g).join(""); //剩余汉字
+                answers = answers.replace(/chuo/g, "chuò");
+                answers = answers.replace(/duo/g, "duō");
+                answers = answers.replace(/蹈/g, "踌躇");
+                answers = answers.replace(/调帐/g, "惆怅");
+                answers = answers.replace(/任悔/g, "忏悔");
+                answers = answers.replace(/仟悔/g, "忏悔");
+                answers = answers.replace(/忧心../g, "忧心忡忡");
                 answers = answers.replace(/美轮美./g, "美轮美奂");
                 answers = answers.replace(/决穿/g, "诀窍");
                 answers = answers.replace(/浙临/g, "濒临");
@@ -2231,9 +2244,9 @@ function do_contest_answer(depth_option, question1) {
                 answers = answers.replace(/瓜熟.落/g, "瓜熟蒂落");
                 answers = answers.replace(/虎视../g, "虎视眈眈");
                 answers = answers.replace(/进裂/g, "崩裂");
-                try{
-                    answers = r.replace(answers);
-                }catch(e){}
+                // try{
+                //     answers = r.replace(answers);
+                // }catch(e){}
                 answers_list += answers;
             }
         } catch (e) {
@@ -2710,167 +2723,43 @@ function zsyAnswer() {
 }
 
 
-function main() {
-    start_app(); //启动app
-    var start = new Date().getTime(); //程序开始时间
-    getScores(0); //获取积分
-    if (rTime != 0 && articles == true) {
-        listenToRadio(); //听电台广播
-        h = device.height; //屏幕高
-        w = device.width; //屏幕宽
-        x = (w / 3) * 2;
-        h1 = (h / 6) * 5;
-        h2 = (h / 6);
-        delay(1);
-        swipe(x, h1, x, h2, 100);
-    }
-    var r_start = new Date().getTime(); //广播开始时间
-
-    // asub = 2;
-    if (订阅 != 'a' && asub != 0) {
-        sub(); //订阅
-    }
-    // aCount = 6;
-    // vCount = 2;
-    var x = 0;
-    while (aCount != 0 && articles == true) {
-        articleStudy(x); //学习文章，包含点赞、分享和评论
-        console.info("等待五秒，然后确认文章是否已满分。");
-        delay(5);
-        getScores(1);
-        x++;
-        if (x > 2) { //尝试三次
-            console.info("尝试2次，跳过。");
-            break;
-        }
-    }
-    if (articles == true) {
-        var end = new Date().getTime(); //广播结束时间
-        var radio_time = (parseInt((end - r_start) / 1000)); //广播已经收听的时间
-        radio_timing(parseInt((end - r_start) / 1000), rTime - radio_time); //广播剩余需收听时间
-        if (rTime != 0) {
-            stopRadio();
-        }
-    }
-    if (myScores['本地频道'] != 1) {
-        localChannel(); //本地频道
-    }
-    var x = 1;
-    while (vCount != 0 && video != 'a') {
-        console.error('当前第' + x + '次');
-        if (video == 'b')
-            videoStudy_news(x); //看视频
-        else if (video == 'a')
-            video_news(x); //电视台
-        else new_bailing_video(x); // 新百灵
-        console.info("等待五秒，然后确认视频是否已满分。");
-        delay(5);
-        getScores(2);
-        x++;
-        if (x > 2) { //尝试三次
-            console.info("尝试2次，跳过。");
-            break;
-        }
-    }
-    //doubleCount = 1;
-    re_store();
-    // tzCount = 1;
-    if (dayCount != 0 || tzCount != 0 || zsyCount != 0 || doubleCount != 0 || (meizhou_txt == true && meizhou != 0) || (zhuanxiang_txt == true && zhuanxiang != 0)) {
-        console.info("进入我要答题");
-        questionShow(); // 进入我要答题
-        delay(1);
-    }
-
-    if (dayCount != 0 && meiri == true)
-        dailyAnswer(); // 每天答题
-    if (tzCount != 0 && tiaozhan == true)
-        challengeQuestion(); //挑战答题
-    delay(2);
-    if (zsyCount != 0 && siren == true) {
-        while (!text("排行榜").exists()) {
-            console.info("等待我要答题界面");
-            delay(1);
-        }
-        var textOrder = text("排行榜").findOnce().parent();
-        while (text("排行榜").exists()) {
-            console.info("点击四人赛答题，悬浮窗位置改变");
-            textOrder.child(8).click();
-            delay(1);
-        }
-        zsyAnswer();
-        //delay(1);
-        // back();
-    }
-
-    if (doubleCount != 0 && siren == true) {
-        while (!text("排行榜").exists()) {
-            console.info("等待我要答题界面");
-            delay(1);
-        }
-        var textOrder = text("排行榜").findOnce().parent();
-        while (text("排行榜").exists()) {
-            console.info("点击双人答题，悬浮窗位置改变");
-            textOrder.child(9).click();
-            delay(1);
-        }
-        zsyAnswer();
-        delay(1);
-    }
-    console.setPosition(0, device.height / 2);
-    delay(1);
-    if (meizhou_txt == true && meizhou != 0) {
-        meizhouAnswer();
-    }
-    if (zhuanxiang_txt == true && zhuanxiang != 0) {
-        zhuanxiangAnswer();
-    }
-    back();
-    end = new Date().getTime();
-    back_table();
-    if(hamibot.env.Token != null && hamibot.env.Token.length > 6){
-        delay(1);
-        push_score();
-    }
-    console.log("运行结束,共耗时" + (parseInt(end - start)) / 1000 + "秒");
-    console.log("3s后自动关闭悬浮窗，查看日志请到hamibot内查看");
-    delay(3);
-    console.hide();
-}
-
 //运行主函数
 // if (随机) {
     
 // } else {
 //     main();
 // }
-if(hamibot.env.restart){
-    console.info('遇到错误则自动重启脚本-开启');
+
+var ta = hamibot.env.alltime*1;
+if(!ta || ta <=0) ta = 1500; 
+var thread = null;
+function rt(){
+    var num = 0;
     while(true){
-        try{
+        num++;
+        console.log('设置脚本运行最长时间为：' + ta+'s');
+        thread = threads.start(function(){
             rand_mode();
-            break;
-        }catch(e){
-            if(e.toString().indexOf('ScriptInterruptedException')!=-1){
-                exit();
-            }
-            console.error(e);
-            console.info('程序异常结束！！！，正在自动重启程序');
-            if (!(launchApp("学习强国") || launch('cn.xuexi.android'))) //启动学习强国app
-            {
-                back_table();
-                delay(1);
-            }
-            else{
-                console.error('未找到xxqg,脚本结束');
-                hamibot.exit();
-                exit();
-            }
-        }
+        })
+        thread.join(ta*1000);
+        thread.interrupt();
+        console.error('脚本超时或者出错！！！，重启脚本');
+        if (!(launchApp("学习强国") || launch('cn.xuexi.android'))) //启动学习强国app
+        {}
+        console.info('等待10s后继续开始');
+        toast('等待10s后继续开始');
+        delay(10);
+        back_table();
+        toast(' ');
+        delay(1);
+        if(num>5) break;
     }
+    console.error('已经重新运行了5轮，停止脚本');
+    question_list = null;
+    console.error('无障碍服务可能出了问题');
+    exit();
 }
-else{
-    rand_mode();
-}
+rt();
 
 function push_score(){
     console.warn('正在获取今日积分');
@@ -2889,8 +2778,6 @@ function push_score(){
 
 function re_store() {
     try {
-        // var ll = http.get('https://gitee.com/lctwelve/picture/raw/master/siren.txt').body.string();
-        // if (ll == '�� �<�i') {
         if(hamibot.env.xianzhi==true){
             console.warn('四人双人答题无限制开启');
             zsyCount = 1;
@@ -2905,7 +2792,7 @@ function back_table() {
         console.info("当前没有在主页，正在返回主页");
         back();
         delay(1);
-        if(hamibot.env.restart && className('Button').textContains('退出').exists()){
+        if(className('Button').textContains('退出').exists()){
             var c = className('Button').textContains('退出').findOne(3000);
             if(c) c.click();
             delay(1);
@@ -2919,7 +2806,7 @@ function rand_mode() {
     start_app(); //启动app
     // 四人();    
     var start = new Date().getTime(); //程序开始时间
-    console.info('随机模式开始');
+    // console.info('随机模式开始');
     getScores(0); //获取积分
     re_store();
     diandian();
@@ -2956,12 +2843,12 @@ function rand_mode() {
     }
     question_list = null;
     article_list = null;
-    end = new Date().getTime();
     back_table();
     if(hamibot.env.Token != null && hamibot.env.Token.length > 6){
         delay(1);
         push_score();
     }
+    end = new Date().getTime();
     console.log("运行结束,共耗时" + (parseInt(end - start)) / 1000 + "秒");
     console.log("3s后自动关闭悬浮窗，查看日志请到hamibot内查看");
     delay(3);
