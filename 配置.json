@@ -41,8 +41,8 @@
   {
     "name": "checkbox_01",
     "type": "checkbox",
-    "label": "专项答题",
-    "help": " "
+    "label": "专项答题(建议手动答题)",
+    "help": "不保证全部正确"
   },
   {
     "name": "select",
@@ -58,8 +58,8 @@
   {
     "name": "checkbox_02",
     "type": "checkbox",
-    "label": "每周答题",
-    "help": " "
+    "label": "每周答题(建议手动答题)",
+    "help": "不保证全部正确"
   },
   {
     "name": "selectm",
@@ -75,28 +75,34 @@
   {
     "name": "checkbox_03",
     "type": "checkbox",
-    "label": "四人/双人答题",
+    "label": "四人答题",
     "help": "勾选之前，需要配置以下信息"
   },
   {
-    "name": "delay",
+    "name": "shuangren",
+    "type": "checkbox",
+    "label": "双人答题",
+    "help": "勾选之前，需要配置以下信息"
+  },
+  {
+    "name": "delay_s",
     "type": "number",
-    "label": "选项出现和文字识别结束后 点击的延迟时间ms毫秒",
+    "label": "四人/双人点击的延迟时间ms毫秒",
     "validation": "required",
-    "help": "说明：时间越短点击越快，时间越长点击越慢。时间太短可能卡住，调高即可"
+    "help": "说明：0ms最快，越大越慢--(文字识别速度影响最大)"
   },
   {
     "name": "select_01",
     "type": "select",
-    "label": "四人赛模式选择",
+    "label": "文字识别(OCR)类型选择",
     "options": {
+      "c": "hamibot内置OCR->推荐",
       "a": "华为OCR接口,需要填入以下关于华为的内容",
       "d": "百度OCR接口,需要填入以下关于百度的内容",
-      "c": "hamibot内置OCR(速度快-hamibot v1.3以上)->推荐",
-      "b": "第三方OCR插件,需要安装第三方插件->推荐"
+      "b": "第三方OCR插件,需要安装第三方插件"
     },
     "validation": "required",
-    "help": "注：一般手机本地识别速度大于云端，部分手机内置ocr识别较慢，请自行测试"
+    "help": "帮助：选择适合自己手机的文字识别，建议都试一遍"
   },
   {
     "name": "AK",
@@ -147,10 +153,10 @@
     "help": " "
   },
   {
-    "name": "",
+    "name": "xxxxxxx",
     "type": "link",
-    "label": "------------------------------------------------------------------",
-    "help": "https://hamibot.com/marketplace/1Kw2X?invite=ONTRWIBaZqdBWuDk6DNzT7rt"
+    "label": "------------------------------------------------------------------------------------------",
+    "help": ""
   },
   {
     "name": "diandian",
@@ -159,10 +165,12 @@
     "help": ""
   },
   {
-    "name": "restart",
-    "type": "checkbox",
-    "label": "遇到错误则自动重启脚本（测试中）",
-    "help": ""
+    "name": "alltime",
+    "type": "number",
+    "label": "看门狗-脚本运行的最长时间，超时或错误则自动重启脚本-时间s秒",
+    "validation": "required",
+    "placeholder": "2000",
+    "help": "部分手机可能出现不可控错误，一般重启脚本解决,故设置看门狗"
   },
   {
     "name": "time1",
@@ -182,7 +190,7 @@
     "name": "xianzhi",
     "type": "checkbox",
     "label": "四人/双人不受积分限制开关",
-    "help": ""
+    "help": "说明：勾选后再一次运行脚本，四人/双人会再答题一次"
   },
   {
     "name": "another",
