@@ -146,7 +146,7 @@ function get_ocr() {
 function get_hamibot_ocr() {
     console.info("你选择了hamibot内置文字识别（OCR）");
     if (app.versionName < "1.3.0-beta.1") {
-        console.error("请去hamibot官网下载版本1.3.0以上的hamibot(下载测试版)！！！，脚本结束");
+        console.error("请去hamibot官网下载版本1.3.0以上的hamibot！！！，脚本结束");
         exit();
     }
 }
@@ -243,7 +243,7 @@ if (shuangren == true || siren == true || 订阅 != 'a' || stronger != 'a' || ti
     
 }
 
-function show_log(){
+function show_log(){    // 使用须知
     threads.start(function () {
         try{
             var text = http.get('https://gitee.com/lctwelve/picture/raw/master/showlogs').body.string();
