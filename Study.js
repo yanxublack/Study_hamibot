@@ -57,7 +57,7 @@ var question_list = [];
 var init_true = false;
 var downloadDialog = null;
 // var init_url = "https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/question";    
-var init_url = 'https://gitee.com/lctwelve/picture/raw/master/question';
+var init_url = 'https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/Study_hamibot/main/question';
 var file_tmp = false;
 var tikus = '';
 /**
