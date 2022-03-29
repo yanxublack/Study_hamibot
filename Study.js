@@ -1,73 +1,12 @@
 auto.waitFor();
 importClass(android.database.sqlite.SQLiteDatabase);
-importClass("java.security.SecureRandom");
-importClass("java.security.MessageDigest");
-importClass("javax.crypto.spec.DESKeySpec");
-importClass("javax.crypto.SecretKeyFactory");
-importClass("javax.crypto.Cipher");
-importClass("java.security.NoSuchAlgorithmException");
-importClass("javax.crypto.KeyGenerator");
-importClass("javax.crypto.SecretKey");
-importClass("javax.crypto.spec.SecretKeySpec");
-importClass("javax.crypto.KeyGenerator");
-importClass("javax.crypto.spec.IvParameterSpec");
-
 importClass(java.net.HttpURLConnection);
 importClass(java.net.URL);
 importClass(java.io.File);
 importClass(java.io.FileOutputStream);
-var config = {
-  iv: "abcdfui8701olkw4",
-  bm: "UTF-8",
-}
-for (var k in config) {
-  var v = config[k]
-  config[k] = new java.lang.String(v)
-}
-
-function javaDecrypt(ciphertext, privateKey) {
-  var keyb = privateKey.getBytes(config.bm); // byte[]
-  var md = MessageDigest.getInstance("SHA-256");
-  var thedigest = md.digest(keyb); // byte[]
-  var skey = new SecretKeySpec(thedigest, "AES");
-  var dcipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-  dcipher.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(config.iv.getBytes()));
-  var clearbyte = dcipher.doFinal(base64Decode(ciphertext));
-  return new java.lang.String(clearbyte);
-}
-
-function base64Decode(r) {
-  var r = android.util.Base64.decode(r, 0)
-  return r
-}
-
-function decrypt(ciphertext) {
-  var info = splitCiphertextAndPassword(ciphertext)
-  var privateKey = info.privateKey
-  var ciphertext = info.ciphertext
-  privateKey = new java.lang.String(privateKey)
-  ciphertext = new java.lang.String(ciphertext)
-  return javaDecrypt(ciphertext, privateKey).toString()
-}
-
-function splitCiphertextAndPassword(ciphertext) {
-  var firstThreeFigures = ciphertext.slice(0, 3)
-  var keyLength = parseInt(firstThreeFigures.slice(0, 1)) + parseInt(firstThreeFigures.slice(1, 2)) + parseInt(firstThreeFigures.slice(2, 3))
-  var privateKey = ciphertext.slice(100, 100 + keyLength)
-  var ciphertext = ciphertext.slice(100 + keyLength)
-  var result = {
-    privateKey: privateKey,
-    ciphertext: ciphertext
-  }
-  return result
-}
-
-
 var url = 'https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/QuestionBank.db';
 var path = '/sdcard/QuestionBank.db';
-var ends = 'e4a4-~e4a4-~d4g4-e4a4-~e4a4-~d4g4-e4a4c5-~e4a4-~d4g4-e4a4,g4c5d5,e4a4e5-~e4a4-~d4g4-e4a4-~e4a4-~d4g4-e4a4,e4a4c5,d4g4d5,d4g4e5,f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~a4d5-e4e5-a4g5-e4c6-a4b5~c6~e4b5~a5~a4g5-e4e5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4a4-c4g4~a4~f4c5-c4a4~d5~g4e5-d4d5~e5~g4g5~c6~d4e5~g5~a4c6-e4b5c6~b5~a4a5-e4g5-a4a5-e4-a4-e4c5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~a4d5-e4e5-a4g5-e4c6-a4b5~c6~e4b5~a5~a4g5-e4e5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5~c5~c4e5~g5~f4a5~g5~c4e5~d5~g4a4-d4c5-g4d5-d4e5-e4a4-~e4a4-~d4g4-e4a4,,e4a4-~e4~e4a4-~g4~e4a4-c5-e4c5-d5-f4a4-~f4~f4a4-~g4~d4a4-g4-d4e4-g4-e4a4-~e4~e4a4-~g4~e4a4-c5-e4d5-e5-f4e5,f4d5~e5~d5-g4c5,g4a4,e4a4-~e4~e4a4-~g4~e4a4-c5-e4c5-d5-f4a4-~f4~f4a4-~g4~d4a4-g4-d4g4-e4-e4a4-~e4~e4a4-~g4~e4a4-c5-e4d5-e5-f4e5,f4d5~e5~d5-g4c5,g4a4,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4,c4e4-g4-c4f4a4,d4g4d5,d4b4,e4a4c5,e4b4-g4-e4a4,e4,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4e4-g4-d4a4-d4a4,d4a4-e4a4c5,f4a4d5,e4a4b4,e4-e4,-a4-c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4f5-d4e5-g4d5-d4c5-g4c5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-f4f5-c4-f4e5-c4-g4d5-d4-g4c5-d4-c4f4d5-e5-d4g4b4-g4-e4a4,e4a4-g4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4f5-d4e5-g4d5-d4c5-g4c5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-f4f5-c4-f4e5-c4-g4d5-d4-g4c5-d4-c4f4d5-c5-d4g4e5-g5-e4a4a5,a4-e4-a4e5g5a5-e5a5-e5a5-e5a5-f4e5a5-e5a5-a5~g5~e5-g4a4c5d5-a4d5-a4d5-a4d5-e4a4d5-a4d5-d5~c5~a4-c4e4g4a4-e4a4-e4a4-e4a4-c4e4a4-e4a4-a4~g4~e4-d4-e4~d4~d4e4~g4~a4~c5~e4e5~g5~a5~c6~e4b5-a4~c5~e4a4e5~c5~a4~e5~e4a4~e5~c5~a4~e4a4e5~c5~a4~e5~e4a4~e5~c5~a4~d4f4f5~d5~a4~f5~d4f4~f5~d5~a4~d4f4f5~d5~a4~f5~d4f4~f5~d5~a4~c4f4f5~c5~a4~f5~c4f4~f5~c5~a4~c4f4f5~c5~a4~f5~c4f4~f5~c5~a4~d4g4d5~b4~g4~d5~d4g4~d5~b4~g4~e4g4e5~b4~g4~e5~e4g4~e5~b4~g4~e4a4e5~c5~a4~e5~e4a4a5~e5~c5~a4~e4a4d5~c5~a4~e5~e4a4b5~c6~a5~e5~d4f4f5~d5~a4~f5~d4f4a5~f5~d5~a4~d4f4f5~d5~a4~f5~d4f4b5~c6~a5~f5~c4f4f5~c5~a4~f5~c4f4a5~f5~c5~a4~c4f4f5~c5~a4~f5~c4f4b5~c6~f5~c5~d4g4d5~b4~g4~d5~d4g4g5~d5~b4~d5~e4g4e5~b4~e5~a5~e4g4b5~a5~e5~a5~c4f4b5~c6~a5~c6~c4f4b5~a5~g5~e5~d4g4d5~e5~c5~e5~d4g4d5~c5~b4~a4~e4a4e5~d5~c5~e5~e4a4d5~c5~b4~c5~e4a4,e4,c4f4a4-b4-c4f4c5-e5-d4g4d5~e5~a5~b5~d4g4c6~b5~a5~b5~e4a4e5,e4a4-g5-e4a4e5,e4a4,c4f4a4~a4~g4~g4~c4f4d5~d5~c5~c5~d4g4e5~e5~d5~d5~d4g4a5~a5~g5~g5~e4a4d5-c5-e4a4e5~g5~e5~g5~e4a4e5,e4a4,c4f4c5-a4~f4~c4~f4~a4~c5~d4g4d5-b4~g4~d4~g4~b4~d5~e4b4e5-~e4b4d5-~e4b4e5~d5~e4b4e5,,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4,c4e4-g4-c4f4a4,d4g4d5,d4b4,e4a4c5,e4b4-g4-e4a4,e4,c4f4c5,c4b4,c4a4,c4g4,c4e4g4-g4~a4~c4e4-d4-c4e4,c4e4-g4-d4a4-d4a4,d4a4-e4a4c5,f4a4d5,e4a4b4,e4-e4,-a4-c5-e4a4d5-~d5-~e5-c4f4e5,-e5-d4g4g5-a5-d5-c5-c4g4e5,a4-c5-e4a4d5-~d5-~e5-c4f4e5,-e5-d4g4f5-e5-d5-c5-c4g4c5,a4-c5-e4a4d5-~d5-~e5-c4f4e5,-e5-d4g4g5-a5-d5-c5-c4g4e5,a4-c5-c4f4f5,e5,d4g4d5,c5,c4f4d5-e5-d4g4d5-e5-e4a4e5,e4a4-g4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4f5-d4e5-g4d5-d4c5-g4c5-c4-g4a4-c4c5-a4d5-e4~d5~a4-e4e5-f4e5-c4-f4-c4e5-g4g5-d4a5-g4d5-d4c5-g4e5-c4-g4a4-c4c5-c4f4f5,e5,d4g4d5,c5,c4f4d5-c5-d4g4e5-g5-e4a4a5~a5~e4a5~a5~a4a5-e4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~a4d5-e4e5-a4g5-e4c6-a4b5~c6~e4b5~a5~a4g5-e4e5-f4d5-c4e5-f4a4~g4~c4a4~g4~g4d5-d4e5-g4a4~g4~d4a4~g4~e4d5-c4e5-e4a4~g4~c4a4~g4~e4c5-c4b4~b4c5~e4a4-c4g4-f4d5~c5~c4e5~g5~f4a5~g5~c4e5~d5~g4a4-d4c5-g4d5-d4e5-e4a4-~e4a4-~d4g4-e4a4,-e5~g5~e4a4e5a5-~e4a4e5a5-~d4g4d5g5-e4a4e5a5';
 device.wakeUpIfNeeded(); //点亮屏幕
-check();
 var first = true;//记录答题的第一次
 var r; // 替换用；
 var meizhou_txt = hamibot.env.checkbox_02;
@@ -688,7 +627,7 @@ function articleStudy(x) {
                     collectCommentShare(); //评论和分享
                 }
                 back(); //返回主界面
-                console.info('返回主界面')
+                console.info('返回主界面');
                 delay(0.3);
                 while (!desc("工作").exists()) { //等待加载出主页
                     console.info("等待加载主页");
@@ -2113,51 +2052,6 @@ function challengeQuestion() {
 }
 //挑战答题
 //////////////////////////////////////////////////////////////////
-function check() {
-    // var flag1 = 0,
-    //     flag2 = 0;
-    // http.__okhttp__.setTimeout(10000);
-    // threads.start(function () {
-    //     try {
-    //         var get = http.get('https://gitee.com/lctwelve/picture/raw/master/check.txt').body.string();
-    //         if (get == ends) flag1 = 1;
-    //         else flag1 = 2;
-    //     } catch (e) {
-    //         flag1 = 2;
-    //     }
-    // });
-    // threads.start(function () {
-    //     try {
-    //         var get = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/check.txt').body.string();
-    //         if (get == (ends + '\n')) flag2 = 1;
-    //         else flag2 = 2;
-    //     } catch (e) {
-    //         flag2 = 2;
-    //     }
-    // });
-    var get = http.get('https://gitee.com/lctwelve/picture/raw/master/check.txt').body.string();
-    if (get == ends){
-        return 0;
-    }
-    // while (true) {
-    //     if (flag1 == 1 || flag2 == 1){
-    //         threads.shutDownAll();
-    //         threads.start(function () {
-    //             try{
-    //                 var x = http.get('https://git.yumenaka.net/https://raw.githubusercontent.com/Twelve-blog/picture/master/replace.js').body.string();
-    //                 files.write('/sdcard/replace.js', x);
-    //                 r = require('/sdcard/replace.js');
-    //             }catch(e){}
-    //         });
-    //         return 0;
-    //     }
-    //     else if (flag1 == 2 && flag2 == 2) break;
-    // }
-    show_log();
-    while(!showlog){sleep(1000);};
-    // console.error('可能有更新嗷，下次见。。。。');
-    exit();
-}
 
 // var xn = 0;
 var 音字 = false;
@@ -2191,7 +2085,8 @@ function do_contest_answer(depth_option, question1) {
                 // answers = answers.match(/[\u4e00-\u9fa5]/g).join(""); //剩余汉字
                 answers = answers.replace(/哆峻/g, "啰唆");
                 answers = answers.replace(/罗峻/g, "罗唆");
-                answers = answers.replace(/暖跎/g, "蹉跎");
+                answers = answers.replace(/暖陀/g, "蹉跎");
+                answers = answers.replace(/暖跑/g, "蹉跎");
                 answers = answers.replace(/跨踏/g, "踌躇");
                 answers = answers.replace(/chuo/g, "chuò");
                 answers = answers.replace(/cuotuo/g, "cuōtuó");
@@ -2623,7 +2518,6 @@ function init(){
             delay(2);
         }
         file_tmp = null;
-        tikus = decrypt(decrypt(tikus));
         tikus = tikus.split('\n');
         for(var i = 0 ;i<tikus.length;i++){
             var t = tikus[i].split(' ');
@@ -2735,6 +2629,7 @@ function zsyAnswer() {
             }
         }
         first = true;
+        音字 = false;
         delay(1);
         if (text('知道了').exists()) {
             console.warn('答题已满');
