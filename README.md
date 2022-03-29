@@ -8,7 +8,7 @@
 **为了学习而Study**
 
 修改来源于：[LazyStudy](https://github.com/lolisaikou/LazyStudy)
-
+[Hamibot_Study](https://hamibot.com/marketplace/1Kw2X?invite=ONTRWIBaZqdBWuDk6DNzT7rt)
 ---
 ## 免责声明
 
